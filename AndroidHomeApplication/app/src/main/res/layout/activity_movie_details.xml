@@ -107,8 +107,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toEndOf="@+id/guideline_start"
-            app:layout_constraintBottom_toBottomOf="@+id/star_2"
-            app:layout_constraintTop_toTopOf="@+id/star_2"
+            app:layout_constraintBottom_toBottomOf="@+id/text_reviews"
+            app:layout_constraintTop_toTopOf="@+id/text_reviews"
             app:srcCompat="@drawable/ic_star"
             app:tint="@color/radical_red" />
 
@@ -117,9 +117,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            app:layout_constraintBottom_toBottomOf="@+id/star_3"
+            app:layout_constraintBottom_toBottomOf="@+id/text_reviews"
+            app:layout_constraintTop_toTopOf="@+id/text_reviews"
             app:layout_constraintStart_toEndOf="@+id/star_1"
-            app:layout_constraintTop_toTopOf="@+id/star_3"
             app:srcCompat="@drawable/ic_star"
             app:tint="@color/radical_red" />
 
@@ -128,9 +128,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            app:layout_constraintBottom_toBottomOf="@+id/star_4"
+            app:layout_constraintBottom_toBottomOf="@+id/text_reviews"
+            app:layout_constraintTop_toTopOf="@+id/text_reviews"
             app:layout_constraintStart_toEndOf="@+id/star_2"
-            app:layout_constraintTop_toTopOf="@+id/star_4"
             app:srcCompat="@drawable/ic_star"
             app:tint="@color/radical_red" />
 
@@ -139,9 +139,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            app:layout_constraintBottom_toBottomOf="@+id/star_5"
+            app:layout_constraintBottom_toBottomOf="@+id/text_reviews"
+            app:layout_constraintTop_toTopOf="@+id/text_reviews"
             app:layout_constraintStart_toEndOf="@+id/star_3"
-            app:layout_constraintTop_toTopOf="@+id/star_5"
             app:srcCompat="@drawable/ic_star"
             app:tint="@color/radical_red" />
 
@@ -151,8 +151,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             app:layout_constraintBottom_toBottomOf="@+id/text_reviews"
-            app:layout_constraintStart_toEndOf="@+id/star_4"
             app:layout_constraintTop_toTopOf="@+id/text_reviews"
+            app:layout_constraintStart_toEndOf="@+id/star_4"
             app:srcCompat="@drawable/ic_star"
             app:tint="@color/storm_gray" />
 
@@ -238,7 +238,7 @@
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@+id/cast_4"
             app:layout_constraintStart_toEndOf="@+id/cast_2"
-            app:layout_constraintTop_toTopOf="@+id/cast_2" />
+            app:layout_constraintTop_toTopOf="@+id/cast_1" />
 
         <ImageView
             android:id="@+id/cast_4"
@@ -249,7 +249,7 @@
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintStart_toEndOf="@+id/cast_3"
-            app:layout_constraintTop_toTopOf="@+id/cast_3" />
+            app:layout_constraintTop_toTopOf="@+id/cast_1" />
 
         <TextView
             android:id="@+id/text_cast_1"
@@ -286,7 +286,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@+id/cast_3"
             app:layout_constraintStart_toStartOf="@+id/cast_3"
-            app:layout_constraintTop_toTopOf="@+id/text_cast_2" />
+            app:layout_constraintTop_toTopOf="@+id/text_cast_1" />
 
         <TextView
             android:id="@+id/text_cast_4"
@@ -298,7 +298,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@+id/cast_4"
             app:layout_constraintStart_toStartOf="@+id/cast_4"
-            app:layout_constraintTop_toTopOf="@+id/text_cast_3" />
+            app:layout_constraintTop_toTopOf="@+id/text_cast_1" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
