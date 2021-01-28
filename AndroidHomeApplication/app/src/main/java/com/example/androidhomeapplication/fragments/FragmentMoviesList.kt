@@ -3,29 +3,25 @@ package com.example.androidhomeapplication.fragments
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentFactory
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.navigation.BackButtonListener
 import com.example.androidhomeapplication.navigation.RouterProvider
-import com.example.androidhomeapplication.navigation.screens.FragmentScreen
+import com.github.terrakok.cicerone.androidx.FragmentScreen
 import kotlinx.android.synthetic.main.fragment_movies_list.*
 
-class FragmentMoviesList : Fragment(R.layout.fragment_movies_list), BackButtonListener {
-
-    companion object {
-        fun newInstance() = FragmentMoviesList()
-    }
+class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         movie_list_item.setOnClickListener {
-            val screen = FragmentScreen(FragmentMovieDetails.newInstance())
-            (parentFragment as RouterProvider).router.navigateTo(screen)
+            (activity?.application as? RouterProvider)?.router?.navigateTo(MovieDetailsScreen())
         }
     }
-
-    override fun onBackPressed(): Boolean {
-        (parentFragment as RouterProvider).router.exit()
-        return true
-    }
 }
+
+class MoviesListScreen : FragmentScreen(
+    key = "MoviesListScreen",
+    fragmentCreator = { fragmentFactory: FragmentFactory -> FragmentMoviesList() }
+)
