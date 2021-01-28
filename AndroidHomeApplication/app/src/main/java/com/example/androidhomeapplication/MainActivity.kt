@@ -1,37 +1,56 @@
 package com.example.androidhomeapplication
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.androidhomeapplication.navigation.screens.Screens
-import ru.terrakok.cicerone.Navigator
-import ru.terrakok.cicerone.Router
-import ru.terrakok.cicerone.android.support.SupportAppNavigator
+import androidx.appcompat.app.AppCompatActivity
+import com.example.androidhomeapplication.navigation.AppNavigator
+import com.example.androidhomeapplication.navigation.AppRouter
+import com.example.androidhomeapplication.navigation.BackButtonListener
+import com.example.androidhomeapplication.navigation.RouterProvider
+import com.example.androidhomeapplication.navigation.container.MovieContainer
+import com.example.androidhomeapplication.navigation.screens.FragmentScreen
+import ru.terrakok.cicerone.Cicerone
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RouterProvider {
 
-    lateinit var navigator: SupportAppNavigator
-    lateinit var router: Router
+    private val cicerone = Cicerone.create(AppRouter())
+    private lateinit var appNavigator: AppNavigator
+
+    override val router: AppRouter
+        get() = cicerone.router
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        navigator = SupportAppNavigator(this, supportFragmentManager, R.id.main_container)
-        router = App.INSTANCE?.getRouter()!!
-        router.navigateTo(Screens.MoviesList())
+        appNavigator = AppNavigator(this, R.id.main_container)
+        appNavigator.initContainers()
+
+        if (savedInstanceState == null) {
+            router.replaceContainer(FragmentScreen(MovieContainer.newInstance()))
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        App.INSTANCE?.getNavigatorHolder()?.setNavigator(navigator)
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        router.replaceContainer(FragmentScreen(MovieContainer.newInstance()))
+    }
+
+    override fun onResumeFragments() {
+        super.onResumeFragments()
+        cicerone.navigatorHolder.setNavigator(appNavigator)
     }
 
     override fun onPause() {
         super.onPause()
-        App.INSTANCE?.getNavigatorHolder()?.removeNavigator()
+        cicerone.navigatorHolder.removeNavigator()
     }
 
     override fun onBackPressed() {
-        router.exit()
+        val fragment = supportFragmentManager.findFragmentById(R.id.main_container)
+        if ((fragment != null && fragment is BackButtonListener && fragment.onBackPressed())) {
+            return
+        } else {
+            router.exit()
+        }
     }
 }
