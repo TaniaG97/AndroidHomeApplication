@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/steel_gray"
-    tools:context=".MovieDetailsActivity">
+    android:background="@color/steel_gray">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -46,27 +45,19 @@
             app:layout_constraintStart_toStartOf="@+id/background"
             app:layout_constraintTop_toTopOf="@+id/background" />
 
-        <ImageView
-            android:id="@+id/arrow_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="59dp"
-            app:layout_constraintStart_toEndOf="@+id/guideline_start"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_arrow_back"
-            app:tint="@color/storm_gray" />
-
         <TextView
             android:id="@+id/text_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="59dp"
             android:text="@string/back"
             android:textColor="@color/storm_gray"
-            app:layout_constraintBottom_toBottomOf="@+id/arrow_back"
-            app:layout_constraintStart_toEndOf="@+id/arrow_back"
-            app:layout_constraintTop_toTopOf="@+id/arrow_back" />
+            android:drawablePadding="8dp"
+            app:layout_constraintStart_toEndOf="@+id/guideline_start"
+            app:layout_constraintTop_toTopOf="parent"
+            app:drawableStartCompat="@drawable/ic_arrow_back"
+            app:drawableTint="@color/storm_gray" />
 
         <TextView
             android:id="@+id/text_age"
@@ -298,6 +289,5 @@
             app:layout_constraintTop_toTopOf="@+id/text_cast_1" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </ScrollView>
 

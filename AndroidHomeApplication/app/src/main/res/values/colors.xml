@@ -13,4 +13,11 @@
     <color name="steel_gray">#191926</color>
     <color name="radical_red">#FF3365</color>
     <color name="radical_red_darker">#FF3466</color>
+
+    <!-- card border -->
+    <color name="mid_gray">#636375</color>
+    <color name="bright_gray">#3B3B4D</color>
+    <!-- card background -->
+    <color name="gun_powder">#8B404056</color>
+    <color name="steel_gray_lighter">#222232</color>
 </resources>

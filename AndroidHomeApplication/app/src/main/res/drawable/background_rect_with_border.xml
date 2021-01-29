@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item>
+        <shape>
+            <corners android:radius="8dp" />
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="@color/mid_gray"
+                android:endColor="@color/bright_gray" />
+        </shape>
+    </item>
+    <item
+        android:bottom="2dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:top="2dp">
+        <shape>
+            <corners android:radius="8dp" />
+            <solid android:color="@color/steel_gray_lighter" />
+        </shape>
+    </item>
+    <item
+        android:bottom="2dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:top="2dp">
+        <shape>
+            <corners android:radius="8dp" />
+            <gradient android:type="radial"
+                android:gradientRadius="140%p"
+                android:centerX="0.5"
+                android:centerY="0.2"
+                android:startColor="@color/gun_powder"
+                android:endColor="@color/steel_gray_lighter" />
+        </shape>
+    </item>
+</layer-list>
+
