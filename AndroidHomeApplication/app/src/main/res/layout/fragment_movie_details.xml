@@ -28,7 +28,7 @@
             app:layout_constraintGuide_end="16dp" />
 
         <ImageView
-            android:id="@+id/background"
+            android:id="@+id/background_image"
             android:layout_width="match_parent"
             android:layout_height="298dp"
             android:scaleType="centerCrop"
@@ -40,10 +40,10 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@drawable/gradient_bottom_to_top"
-            app:layout_constraintBottom_toBottomOf="@+id/background"
-            app:layout_constraintEnd_toEndOf="@+id/background"
-            app:layout_constraintStart_toStartOf="@+id/background"
-            app:layout_constraintTop_toTopOf="@+id/background" />
+            app:layout_constraintBottom_toBottomOf="@+id/background_image"
+            app:layout_constraintEnd_toEndOf="@+id/background_image"
+            app:layout_constraintStart_toStartOf="@+id/background_image"
+            app:layout_constraintTop_toTopOf="@+id/background_image" />
 
         <TextView
             android:id="@+id/text_back"
@@ -64,34 +64,34 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="56dp"
-            android:text="@string/age"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toBottomOf="@+id/background"
+            app:layout_constraintBottom_toBottomOf="@+id/background_image"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintStart_toEndOf="@+id/guideline_start" />
+            app:layout_constraintStart_toEndOf="@+id/guideline_start"
+            tools:text="13+"/>
 
         <TextView
             android:id="@+id/text_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/avengers_end_game"
             android:textColor="@color/gallery"
             android:textSize="40sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintStart_toEndOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/text_age" />
+            app:layout_constraintTop_toBottomOf="@+id/text_age"
+            tools:text="Avengers End Game"/>
 
         <TextView
             android:id="@+id/text_move_types"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@string/action_adventure_fantasy"
             android:textColor="@color/radical_red_darker"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintStart_toEndOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/text_title" />
+            app:layout_constraintTop_toBottomOf="@+id/text_title"
+            tools:text="Action, Adventure, Fantasy"/>
 
         <ImageView
             android:id="@+id/star_1"
@@ -101,7 +101,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/text_reviews"
             app:layout_constraintTop_toTopOf="@+id/text_reviews"
             app:srcCompat="@drawable/ic_star"
-            app:tint="@color/radical_red" />
+            app:tint="@color/storm_gray" />
 
         <ImageView
             android:id="@+id/star_2"
@@ -111,7 +111,7 @@
             app:layout_constraintTop_toTopOf="@+id/star_1"
             app:layout_constraintStart_toEndOf="@+id/star_1"
             app:srcCompat="@drawable/ic_star"
-            app:tint="@color/radical_red" />
+            app:tint="@color/storm_gray" />
 
         <ImageView
             android:id="@+id/star_3"
@@ -121,7 +121,7 @@
             app:layout_constraintTop_toTopOf="@+id/star_1"
             app:layout_constraintStart_toEndOf="@+id/star_2"
             app:srcCompat="@drawable/ic_star"
-            app:tint="@color/radical_red" />
+            app:tint="@color/storm_gray" />
 
         <ImageView
             android:id="@+id/star_4"
@@ -131,7 +131,7 @@
             app:layout_constraintTop_toTopOf="@+id/star_1"
             app:layout_constraintStart_toEndOf="@+id/star_3"
             app:srcCompat="@drawable/ic_star"
-            app:tint="@color/radical_red" />
+            app:tint="@color/storm_gray" />
 
         <ImageView
             android:id="@+id/star_5"
@@ -149,13 +149,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
-            android:text="@string/reviews"
             android:textColor="@color/storm_gray"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/star_5"
             app:layout_constraintTop_toBottomOf="@+id/text_move_types"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_end"/>
+            app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+            tools:text="125 Reviews"/>
 
         <TextView
             android:id="@+id/text_storyline"
@@ -175,12 +175,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@string/storyline_description"
             android:textColor="@color/white_transparent"
             android:textSize="14sp"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintStart_toEndOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/text_storyline" />
+            app:layout_constraintTop_toBottomOf="@+id/text_storyline"
+            tools:text="Storyline description \nStoryline description \nStoryline description"/>
 
         <TextView
             android:id="@+id/text_cast"
@@ -195,98 +195,21 @@
             app:layout_constraintStart_toEndOf="@+id/guideline_start"
             app:layout_constraintTop_toBottomOf="@+id/text_storyline_description" />
 
-        <ImageView
-            android:id="@+id/cast_1"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/casts_rv"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
-            android:src="@drawable/robert_downey_jr"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toStartOf="@+id/cast_2"
-            app:layout_constraintStart_toEndOf="@+id/guideline_start"
-            app:layout_constraintTop_toBottomOf="@+id/text_cast" />
-
-        <ImageView
-            android:id="@+id/cast_2"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/chris_evans"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toStartOf="@+id/cast_3"
-            app:layout_constraintStart_toEndOf="@+id/cast_1"
-            app:layout_constraintTop_toTopOf="@+id/cast_1" />
-
-        <ImageView
-            android:id="@+id/cast_3"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/mark_ruffalo"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toStartOf="@+id/cast_4"
-            app:layout_constraintStart_toEndOf="@+id/cast_2"
-            app:layout_constraintTop_toTopOf="@+id/cast_1" />
-
-        <ImageView
-            android:id="@+id/cast_4"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/chris_hemsworth"
-            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-            app:layout_constraintStart_toEndOf="@+id/cast_3"
-            app:layout_constraintTop_toTopOf="@+id/cast_1" />
-
-        <TextView
-            android:id="@+id/text_cast_1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="@string/robert_downey_jr"
-            android:textColor="@color/alto"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/cast_1"
-            app:layout_constraintStart_toStartOf="@+id/cast_1"
-            app:layout_constraintTop_toBottomOf="@+id/cast_1" />
-
-        <TextView
-            android:id="@+id/text_cast_2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/chris_evans"
-            android:textColor="@color/alto"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/cast_2"
-            app:layout_constraintStart_toStartOf="@+id/cast_2"
-            app:layout_constraintTop_toTopOf="@+id/text_cast_1" />
-
-        <TextView
-            android:id="@+id/text_cast_3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/mark_ruffalo"
-            android:textColor="@color/alto"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/cast_3"
-            app:layout_constraintStart_toStartOf="@+id/cast_3"
-            app:layout_constraintTop_toTopOf="@+id/text_cast_1" />
-
-        <TextView
-            android:id="@+id/text_cast_4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/chris_hemsworth"
-            android:textColor="@color/alto"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/cast_4"
-            app:layout_constraintStart_toStartOf="@+id/cast_4"
-            app:layout_constraintTop_toTopOf="@+id/text_cast_1" />
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/guideline_start"
+            app:layout_constraintTop_toBottomOf="@+id/text_cast"
+            app:layout_constraintVertical_bias="0.2"
+            tools:itemCount="5"
+            tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_movie_cast"
+            tools:orientation="horizontal"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
