@@ -42,7 +42,7 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
 
         movieData?.let {
             background_image.setImageResource(movieData.detailPoster)
-            text_age.text = "${movieData.ageLimit}+"
+            text_age.text = context?.getString(R.string.age_template, movieData.ageLimit)
             text_title.text = movieData.title
             text_move_types.text = movieData.genresList.joinToString(", ")
             stars.forEachIndexed { index, imageView ->
@@ -62,7 +62,7 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
                     )
                 }
             }
-            text_reviews.text = "${movieData.reviewCount} Reviews"
+            text_reviews.text = context?.getString(R.string.reviews_template, movieData.reviewCount)
             text_storyline_description.text = movieData.description
 
             casts_rv.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL, false)

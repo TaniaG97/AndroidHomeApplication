@@ -50,7 +50,7 @@ class MoviesListAdapter(
 
         fun bind(itemData: MovieData) {
             image.setImageResource(itemData.poster)
-            textAge.text = "${itemData.ageLimit}+"
+            textAge.text = itemView.context?.getString(R.string.age_template, itemData.ageLimit)
             iconLike.imageTintList = if (itemData.isLiked) {
                 ColorStateList.valueOf(
                     ContextCompat.getColor(
@@ -84,9 +84,9 @@ class MoviesListAdapter(
                     )
                 }
             }
-            textReviews.text = "${itemData.reviewCount} Reviews"
+            textReviews.text = itemView.context?.getString(R.string.reviews_template, itemData.reviewCount)
             textTitle.text = itemData.title
-            moveTime.text = "${itemData.time} MIN"
+            moveTime.text = itemView.context?.getString(R.string.time_template, itemData.time)
 
             itemView.setOnClickListener {
                 onItemClick?.invoke(itemData)

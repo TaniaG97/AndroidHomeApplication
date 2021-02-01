@@ -4,4 +4,8 @@
     <string name="storyline">Storyline</string>
     <string name="cast">Cast</string>
     <string name="movies_list">Movies list</string>
+
+    <string name="age_template">%1$d+</string>
+    <string name="reviews_template">%1$d Reviews</string>
+    <string name="time_template">%1$d MIN</string>
 </resources>
