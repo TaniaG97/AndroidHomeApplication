@@ -19,16 +19,13 @@
         tools:src="@drawable/robert_downey_jr"/>
     <TextView
         android:id="@+id/item_cast_text"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:textColor="@color/alto"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/item_cast_image"
-        app:layout_constraintStart_toStartOf="@+id/item_cast_image"
         app:layout_constraintTop_toBottomOf="@+id/item_cast_image"
-        app:layout_constraintBottom_toBottomOf="parent"
         tools:text="Robert Downey Jr."/>
 
 

@@ -1,10 +1,12 @@
 package com.example.androidhomeapplication.models
 
+import android.os.Parcelable
 import androidx.annotation.DrawableRes
-import java.io.Serializable
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class MovieData(
-    val id: Int,
+    val id: Long,
     @DrawableRes val poster: Int,
     @DrawableRes val detailPoster: Int,
     val title: String,
@@ -16,13 +18,5 @@ data class MovieData(
     val starCount: Int,
     val reviewCount: Int,
     val castList: List<CastData>
-): Serializable
+): Parcelable
 
-enum class MovieGenres(val value: String) {
-    ACTION("Action"),
-    ADVENTURE("Adventure"),
-    DRAMA("Drama"),
-    FANTASY("Fantasy"),
-    SCI_FI("Sci-Fi"),
-    THRILLER("Thriller")
-}

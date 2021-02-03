@@ -10,7 +10,6 @@ import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.androidx.AppNavigator
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
-
     private val navigatorHolder: NavigatorHolder? get() = (application as? NavigatorHolderProvider)?.navigatorHolder
 
     override fun onCreate(savedInstanceState: Bundle?) {

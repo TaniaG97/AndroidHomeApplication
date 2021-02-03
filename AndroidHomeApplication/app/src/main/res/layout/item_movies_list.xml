@@ -28,17 +28,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintGuide_end="8dp" />
 
-        <View
-            android:id="@+id/item_background"
-            android:layout_width="170dp"
-            android:layout_height="296dp"
-            android:layout_margin="6dp"
-            android:background="@drawable/background_rect_with_border"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/item_image"
             android:layout_width="match_parent"
@@ -96,68 +85,28 @@
             app:layout_constraintStart_toEndOf="@+id/item_guideline_start"
             tools:text="Action, Adventure, Fantasy" />
 
-        <ImageView
-            android:id="@+id/star_1"
-            android:layout_width="8dp"
+        <include
+            android:id="@+id/item_stars"
+            android:layout_width="wrap_content"
             android:layout_height="8dp"
+            layout="@layout/view_stars"
             app:layout_constraintBottom_toBottomOf="@+id/item_text_reviews"
             app:layout_constraintStart_toEndOf="@+id/item_guideline_start"
-            app:layout_constraintTop_toTopOf="@+id/item_text_reviews"
-            app:srcCompat="@drawable/ic_star"
-            app:tint="@color/storm_gray" />
-
-        <ImageView
-            android:id="@+id/star_2"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginStart="2dp"
-            app:layout_constraintStart_toEndOf="@+id/star_1"
-            app:layout_constraintTop_toTopOf="@+id/star_1"
-            app:srcCompat="@drawable/ic_star"
-            app:tint="@color/storm_gray" />
-
-        <ImageView
-            android:id="@+id/star_3"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginStart="2dp"
-            app:layout_constraintStart_toEndOf="@+id/star_2"
-            app:layout_constraintTop_toTopOf="@+id/star_1"
-            app:srcCompat="@drawable/ic_star"
-            app:tint="@color/storm_gray" />
-
-        <ImageView
-            android:id="@+id/star_4"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginStart="2dp"
-            app:layout_constraintStart_toEndOf="@+id/star_3"
-            app:layout_constraintTop_toTopOf="@+id/star_1"
-            app:srcCompat="@drawable/ic_star"
-            app:tint="@color/storm_gray" />
-
-        <ImageView
-            android:id="@+id/star_5"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginStart="2dp"
-            app:layout_constraintStart_toEndOf="@+id/star_4"
-            app:layout_constraintTop_toTopOf="@+id/star_1"
-            app:srcCompat="@drawable/ic_star"
-            app:tint="@color/storm_gray" />
+            app:layout_constraintTop_toTopOf="@+id/item_text_reviews"/>
 
         <TextView
             android:id="@+id/item_text_reviews"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="6dp"
             android:layout_marginBottom="8dp"
             android:textColor="@color/storm_gray"
             android:textSize="8sp"
             android:textStyle="bold"
+            android:textAllCaps="true"
             app:layout_constraintBottom_toBottomOf="@+id/item_image"
             app:layout_constraintEnd_toStartOf="@+id/item_guideline_end"
-            app:layout_constraintStart_toEndOf="@+id/star_5"
+            app:layout_constraintStart_toEndOf="@+id/item_stars"
             tools:text="125 Reviews" />
 
         <TextView
@@ -165,8 +114,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:maxLines="1"
             android:ellipsize="end"
-            android:singleLine="true"
             android:textColor="@color/gallery"
             android:textSize="14sp"
             android:textStyle="bold"

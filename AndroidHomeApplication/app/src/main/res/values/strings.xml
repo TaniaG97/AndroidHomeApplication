@@ -7,5 +7,5 @@
 
     <string name="age_template">%1$d+</string>
     <string name="reviews_template">%1$d Reviews</string>
-    <string name="time_template">%1$d MIN</string>
+    <string name="time_template">%1$d min</string>
 </resources>

@@ -2,7 +2,7 @@ package com.example.androidhomeapplication
 
 import com.example.androidhomeapplication.models.CastData
 import com.example.androidhomeapplication.models.MovieData
-import com.example.androidhomeapplication.models.MovieGenres
+import com.example.androidhomeapplication.models.MovieGenre
 
 object DataGenerator {
 
@@ -14,9 +14,9 @@ object DataGenerator {
             title = "Avengers: End Game",
             description = "After the devastating events of Avengers: Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos\\' actions and restore balance to the universe.",
             genresList = listOf(
-                MovieGenres.ACTION.value,
-                MovieGenres.ADVENTURE.value,
-                MovieGenres.FANTASY.value
+                MovieGenre.ACTION.value,
+                MovieGenre.ADVENTURE.value,
+                MovieGenre.FANTASY.value
             ),
             ageLimit = 13,
             time = 137,
@@ -37,9 +37,9 @@ object DataGenerator {
             title = "Tenet",
             description = "Interesting Description",
             genresList = listOf(
-                MovieGenres.ACTION.value,
-                MovieGenres.SCI_FI.value,
-                MovieGenres.THRILLER.value
+                MovieGenre.ACTION.value,
+                MovieGenre.SCI_FI.value,
+                MovieGenre.THRILLER.value
             ),
             ageLimit = 13,
             time = 97,
@@ -61,9 +61,9 @@ object DataGenerator {
             title = "Black Widow",
             description = "Interesting Description",
             genresList = listOf(
-                MovieGenres.ACTION.value,
-                MovieGenres.ADVENTURE.value,
-                MovieGenres.SCI_FI.value
+                MovieGenre.ACTION.value,
+                MovieGenre.ADVENTURE.value,
+                MovieGenre.SCI_FI.value
             ),
             ageLimit = 13,
             time = 102,
@@ -84,9 +84,9 @@ object DataGenerator {
             title = "Wonder Woman 1984",
             description = "Interesting Description",
             genresList = listOf(
-                MovieGenres.ACTION.value,
-                MovieGenres.ADVENTURE.value,
-                MovieGenres.FANTASY.value
+                MovieGenre.ACTION.value,
+                MovieGenre.ADVENTURE.value,
+                MovieGenre.FANTASY.value
             ),
             ageLimit = 13,
             time = 120,
