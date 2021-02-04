@@ -9,27 +9,34 @@ import com.example.androidhomeapplication.DataGenerator
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
 import com.example.androidhomeapplication.databinding.FragmentMoviesListBinding
+import com.example.androidhomeapplication.fragments.movieDetails.CastsListAdapter
 import com.example.androidhomeapplication.fragments.movieDetails.MovieDetailsScreen
+import com.example.androidhomeapplication.models.CastData
+import com.example.androidhomeapplication.models.MovieData
 import com.example.androidhomeapplication.navigation.RouterProvider
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
 class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
     private lateinit var binding: FragmentMoviesListBinding
+    lateinit var adapter: MoviesListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding = FragmentMoviesListBinding.bind(view)
 
-        binding.cinemaRv.layoutManager = GridLayoutManager(context, 2)
-
-        val moviesListAdapter = MoviesListAdapter(
-            items = DataGenerator.getMoviesList(),
+        adapter = MoviesListAdapter(
             onItemClick = { item->
                 (activity?.application as? RouterProvider)?.router?.navigateTo(MovieDetailsScreen(item))
             })
-        binding.cinemaRv.adapter = moviesListAdapter
 
+        binding.cinemaRv.layoutManager = GridLayoutManager(context, 2)
+        binding.cinemaRv.adapter = adapter
+        updateAdapter(DataGenerator.getMoviesList())
+    }
+
+    fun updateAdapter(moviesList: List<MovieData>) {
+        adapter.submitList(moviesList)
     }
 }
 

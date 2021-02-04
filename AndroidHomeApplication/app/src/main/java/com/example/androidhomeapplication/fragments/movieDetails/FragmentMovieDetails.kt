@@ -10,13 +10,16 @@ import androidx.fragment.app.FragmentFactory
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.Utils
+import com.example.androidhomeapplication.Utils.setImageActiveState
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
+import com.example.androidhomeapplication.models.CastData
 import com.example.androidhomeapplication.models.MovieData
 import com.example.androidhomeapplication.navigation.RouterProvider
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
 class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private lateinit var binding: FragmentMovieDetailsBinding
+    lateinit var adapter: CastsListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,18 +52,24 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
 
             stars.forEachIndexed { index, imageView ->
                 if (index < movieData.starCount) {
-                    Utils.setImageActiveState(true, imageView)
+                    imageView.setImageActiveState(isActive = true)
                 } else {
-                    Utils.setImageActiveState(false, imageView)
+                    imageView.setImageActiveState(isActive = false)
                 }
             }
 
-            binding.textReviews.text = context?.getString(R.string.reviews_template, movieData.reviewCount)
+            binding.textReviews.text = getString(R.string.reviews_template, movieData.reviewCount)
             binding.textStorylineDescription.text = movieData.description
 
+            adapter=CastsListAdapter()
             binding.castsRv.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL, false)
-            binding.castsRv.adapter = CastsListAdapter(movieData.castList)
+            binding.castsRv.adapter = adapter
+            updateAdapter(movieData.castList)
         }
+    }
+
+    fun updateAdapter(castsList: List<CastData>) {
+        adapter.submitList(castsList)
     }
 
     companion object {
