@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.annotation.DrawableRes
 import kotlinx.android.parcel.Parcelize
 
-@Parcelize
 data class MovieData(
     val id: Long,
     @DrawableRes val posterResId: Int,
@@ -18,5 +17,5 @@ data class MovieData(
     val starCount: Int,
     val reviewCount: Int,
     val castList: List<CastData>
-): Parcelable
+)
 

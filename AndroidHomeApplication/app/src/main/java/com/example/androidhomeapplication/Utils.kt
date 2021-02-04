@@ -30,10 +30,6 @@ fun ViewStarsBinding.setRating(activeElements: Int){
         this.star4,
         this.star5
     ).forEachIndexed { index, imageView ->
-        if (index < activeElements) {
-            imageView.setImageActiveState(isActive = true)
-        } else {
-            imageView.setImageActiveState(isActive = false)
-        }
+        imageView.setImageActiveState(isActive = (index < activeElements))
     }
 }

@@ -28,8 +28,8 @@ class MoviesListAdapter(
 }
 
 class TaskDiffCallBack : DiffUtil.ItemCallback<MovieData>() {
-    override fun areItemsTheSame(oldItem: MovieData, newItem: MovieData): Boolean = oldItem.id == newItem.id
-    override fun areContentsTheSame(oldItem: MovieData, newItem: MovieData): Boolean = oldItem == newItem
+    override fun areItemsTheSame(oldItem: MovieData, newItem: MovieData): Boolean = (oldItem.id == newItem.id)
+    override fun areContentsTheSame(oldItem: MovieData, newItem: MovieData): Boolean = (oldItem === newItem)
 }
 
 class MovieItemViewHolder(
@@ -38,8 +38,16 @@ class MovieItemViewHolder(
 ) : RecyclerView.ViewHolder(itemView) {
 
     private val binding by viewBinding(ItemMoviesListBinding::bind)
+    private var itemData: MovieData?=null
+
+    init {
+        itemView.setOnClickListener {
+            itemData?.let(onItemClick)
+        }
+    }
 
     fun bind(itemData: MovieData) {
+        this.itemData = itemData
         binding.itemImage.setImageResource(itemData.posterResId)
         binding.itemTextAge.text = itemView.context.getString(R.string.age_template, itemData.ageLimit)
         binding.itemIconLike.setImageActiveState(isActive = itemData.isLiked)
@@ -48,9 +56,5 @@ class MovieItemViewHolder(
         binding.itemTextReviews.text = itemView.context?.getString(R.string.reviews_template, itemData.reviewCount)
         binding.itemTextTitle.text = itemData.title
         binding.itemMoveTime.text = itemView.context?.getString(R.string.time_template, itemData.time)
-
-        itemView.setOnClickListener {
-            onItemClick.invoke(itemData)
-        }
     }
 }

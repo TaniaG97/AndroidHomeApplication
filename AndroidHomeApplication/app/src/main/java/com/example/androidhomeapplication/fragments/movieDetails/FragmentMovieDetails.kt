@@ -69,5 +69,3 @@ class MovieDetailsScreen(private val movieId: Long) : FragmentScreen(
         fragment
     }
 )
-
-

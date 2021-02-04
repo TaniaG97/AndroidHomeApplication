@@ -23,8 +23,8 @@ class CastsListAdapter() : ListAdapter<CastData, CastItemViewHolder>(TaskDiffCal
 }
 
 private class TaskDiffCallBack : DiffUtil.ItemCallback<CastData>() {
-    override fun areItemsTheSame(oldItem: CastData, newItem: CastData): Boolean = oldItem.id == newItem.id
-    override fun areContentsTheSame(oldItem: CastData, newItem: CastData): Boolean = oldItem == newItem
+    override fun areItemsTheSame(oldItem: CastData, newItem: CastData): Boolean = (oldItem.id == newItem.id)
+    override fun areContentsTheSame(oldItem: CastData, newItem: CastData): Boolean = (oldItem === newItem)
 }
 
 class CastItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
