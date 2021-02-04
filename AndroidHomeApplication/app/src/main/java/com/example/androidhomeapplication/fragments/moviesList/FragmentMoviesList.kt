@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.recyclerview.widget.GridLayoutManager
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.androidhomeapplication.DataGenerator
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
@@ -17,17 +18,16 @@ import com.example.androidhomeapplication.navigation.RouterProvider
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
 class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
-    private lateinit var binding: FragmentMoviesListBinding
+    private val binding by viewBinding(FragmentMoviesListBinding::bind)
     lateinit var adapter: MoviesListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding = FragmentMoviesListBinding.bind(view)
 
         adapter = MoviesListAdapter(
             onItemClick = { item->
-                (activity?.application as? RouterProvider)?.router?.navigateTo(MovieDetailsScreen(item))
+                (activity?.application as? RouterProvider)?.router?.navigateTo(MovieDetailsScreen(item.id))
             })
 
         binding.cinemaRv.layoutManager = GridLayoutManager(context, 2)
@@ -35,7 +35,7 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
         updateAdapter(DataGenerator.getMoviesList())
     }
 
-    fun updateAdapter(moviesList: List<MovieData>) {
+    private fun updateAdapter(moviesList: List<MovieData>) {
         adapter.submitList(moviesList)
     }
 }

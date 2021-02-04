@@ -8,5 +8,5 @@ import kotlinx.android.parcel.Parcelize
 data class CastData (
     val id: Long,
     val name: String,
-    @DrawableRes val image: Int,
+    @DrawableRes val imageResId: Int,
 ): Parcelable

@@ -6,7 +6,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.androidhomeapplication.R
+import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
 import com.example.androidhomeapplication.databinding.ItemMovieCastBinding
 import com.example.androidhomeapplication.models.CastData
 
@@ -17,27 +19,19 @@ class CastsListAdapter() : ListAdapter<CastData, CastItemViewHolder>(TaskDiffCal
         return CastItemViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: CastItemViewHolder, position: Int) {
-        holder.bind(getItem(position))
-    }
+    override fun onBindViewHolder(holder: CastItemViewHolder, position: Int) = holder.bind(getItem(position))
+}
 
-    class TaskDiffCallBack : DiffUtil.ItemCallback<CastData>() {
-        override fun areItemsTheSame(oldItem: CastData, newItem: CastData): Boolean {
-            return oldItem.id == newItem.id;
-        }
-
-        override fun areContentsTheSame(oldItem: CastData, newItem: CastData): Boolean {
-            return oldItem == newItem
-        }
-    }
-
+private class TaskDiffCallBack : DiffUtil.ItemCallback<CastData>() {
+    override fun areItemsTheSame(oldItem: CastData, newItem: CastData): Boolean = oldItem.id == newItem.id
+    override fun areContentsTheSame(oldItem: CastData, newItem: CastData): Boolean = oldItem == newItem
 }
 
 class CastItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val binding = ItemMovieCastBinding.bind(itemView)
+    private val binding by viewBinding(ItemMovieCastBinding::bind)
 
     fun bind(castData: CastData) {
-        binding.itemCastImage.setImageResource(castData.image)
+        binding.itemCastImage.setImageResource(castData.imageResId)
         binding.itemCastText.text = castData.name
     }
 }

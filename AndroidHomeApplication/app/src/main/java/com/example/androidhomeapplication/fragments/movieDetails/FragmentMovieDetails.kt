@@ -1,89 +1,73 @@
 package com.example.androidhomeapplication.fragments.movieDetails
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.recyclerview.widget.LinearLayoutManager
+import by.kirich1409.viewbindingdelegate.viewBinding
+import com.example.androidhomeapplication.DataGenerator
 import com.example.androidhomeapplication.R
-import com.example.androidhomeapplication.Utils
-import com.example.androidhomeapplication.Utils.setImageActiveState
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
 import com.example.androidhomeapplication.models.CastData
 import com.example.androidhomeapplication.models.MovieData
 import com.example.androidhomeapplication.navigation.RouterProvider
+import com.example.androidhomeapplication.setRating
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
+private const val KEY_MOVIE_ID = "movie_id"
+
 class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
-    private lateinit var binding: FragmentMovieDetailsBinding
-    lateinit var adapter: CastsListAdapter
+    private val binding by viewBinding(FragmentMovieDetailsBinding::bind)
+    private val adapter: CastsListAdapter = CastsListAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding = FragmentMovieDetailsBinding.bind(view)
+        initViews()
 
-        val stars: List<ImageView> = listOf(
-            view.findViewById(R.id.star_1),
-            view.findViewById(R.id.star_2),
-            view.findViewById(R.id.star_3),
-            view.findViewById(R.id.star_4),
-            view.findViewById(R.id.star_5)
-        )
+        val movieId = arguments?.getLong(KEY_MOVIE_ID)
+        val movieData = DataGenerator.getMoviesList().find { it.id == movieId }
+        if (movieData != null) {
+            setMovieFields(movieData)
+        }
+    }
 
-        initViews(stars)
+    private fun initViews() {
+        binding.castsRv.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.castsRv.adapter = adapter
 
         binding.textBack.setOnClickListener {
             (activity?.application as? RouterProvider)?.router?.exit()
         }
     }
 
-    private fun initViews(stars: List<ImageView>){
-        val movieData = arguments?.getParcelable<MovieData>(KEY_MOVIE_DATA)
-
-        movieData?.let {
-            binding.backgroundImage.setImageResource(movieData.detailPoster)
-            binding.textAge.text = context?.getString(R.string.age_template, movieData.ageLimit)
-            binding.textTitle.text = movieData.title
-            binding.textMoveTypes.text = movieData.genresList.joinToString(", ")
-
-            stars.forEachIndexed { index, imageView ->
-                if (index < movieData.starCount) {
-                    imageView.setImageActiveState(isActive = true)
-                } else {
-                    imageView.setImageActiveState(isActive = false)
-                }
-            }
-
-            binding.textReviews.text = getString(R.string.reviews_template, movieData.reviewCount)
-            binding.textStorylineDescription.text = movieData.description
-
-            adapter=CastsListAdapter()
-            binding.castsRv.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL, false)
-            binding.castsRv.adapter = adapter
-            updateAdapter(movieData.castList)
-        }
+    private fun setMovieFields(movieData: MovieData) {
+        binding.backgroundImage.setImageResource(movieData.detailPosterResId)
+        binding.textAge.text = context?.getString(R.string.age_template, movieData.ageLimit)
+        binding.textTitle.text = movieData.title
+        binding.textMoveTypes.text = movieData.genresList.joinToString(", ")
+        binding.stars.setRating(movieData.starCount)
+        binding.textReviews.text = getString(R.string.reviews_template, movieData.reviewCount)
+        binding.textStorylineDescription.text = movieData.description
+        updateAdapter(movieData.castList)
     }
 
-    fun updateAdapter(castsList: List<CastData>) {
+    private fun updateAdapter(castsList: List<CastData>) {
         adapter.submitList(castsList)
-    }
-
-    companion object {
-        private const val KEY_MOVIE_DATA = "movie_data"
-
-        fun getNewInstance(movieData: MovieData) = FragmentMovieDetails().apply {
-            arguments = Bundle().apply {
-                putParcelable(KEY_MOVIE_DATA, movieData)
-            }
-        }
     }
 }
 
-class MovieDetailsScreen(movieData: MovieData) : FragmentScreen(
+class MovieDetailsScreen(private val movieId: Long) : FragmentScreen(
     key = "MovieDetailsScreen",
-    fragmentCreator = { fragmentFactory: FragmentFactory -> FragmentMovieDetails.getNewInstance(movieData) }
+    fragmentCreator = { fragmentFactory: FragmentFactory ->
+        val fragment = FragmentMovieDetails()
+        val args = Bundle(1)
+        args.putLong(KEY_MOVIE_ID, movieId)
+        fragment.arguments = args
+        fragment
+    }
 )
+
+

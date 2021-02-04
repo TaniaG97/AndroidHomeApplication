@@ -7,8 +7,8 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class MovieData(
     val id: Long,
-    @DrawableRes val poster: Int,
-    @DrawableRes val detailPoster: Int,
+    @DrawableRes val posterResId: Int,
+    @DrawableRes val detailPosterResId: Int,
     val title: String,
     val description: String,
     val genresList: List<String>,
