@@ -2,7 +2,7 @@ package com.example.androidhomeapplication
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.androidhomeapplication.fragments.MoviesListScreen
+import com.example.androidhomeapplication.fragments.moviesList.MoviesListScreen
 import com.example.androidhomeapplication.navigation.BackButtonListener
 import com.example.androidhomeapplication.navigation.NavigatorHolderProvider
 import com.example.androidhomeapplication.navigation.RouterProvider
@@ -10,7 +10,6 @@ import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.androidx.AppNavigator
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
-
     private val navigatorHolder: NavigatorHolder? get() = (application as? NavigatorHolderProvider)?.navigatorHolder
 
     override fun onCreate(savedInstanceState: Bundle?) {
