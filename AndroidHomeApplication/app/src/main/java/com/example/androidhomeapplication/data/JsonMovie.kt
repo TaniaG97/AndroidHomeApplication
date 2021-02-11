@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal class JsonMovie(
-    val id: Int,
+    val id: Long,
     val title: String,
     @SerialName("poster_path")
     val posterPicture: String,
@@ -13,8 +13,8 @@ internal class JsonMovie(
     val backdropPicture: String,
     val runtime: Int,
     @SerialName("genre_ids")
-    val genreIds: List<Int>,
-    val actors: List<Int>,
+    val genreIds: List<Long>,
+    val actors: List<Long>,
     @SerialName("vote_average")
     val ratings: Float,
     @SerialName("vote_count")

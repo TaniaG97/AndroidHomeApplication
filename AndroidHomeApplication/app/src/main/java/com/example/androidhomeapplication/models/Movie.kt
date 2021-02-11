@@ -4,7 +4,7 @@ import com.example.androidhomeapplication.models.Actor
 import com.example.androidhomeapplication.models.Genre
 
 data class Movie(
-    val id: Int,
+    val id: Long,
     val pgAge: Int,
     val title: String,
     val genres: List<Genre>,

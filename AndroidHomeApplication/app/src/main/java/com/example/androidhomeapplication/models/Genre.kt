@@ -1,3 +1,3 @@
 package com.example.androidhomeapplication.models
 
-data class Genre(val id: Int, val name: String)
+data class Genre(val id: Long, val name: String)

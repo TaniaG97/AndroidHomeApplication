@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.android.academy.fundamentals.homework.data.JsonMovieRepository
@@ -35,7 +36,7 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
 
     private fun updateAdapter() {
         val repository = JsonMovieRepository(requireContext())
-        MainScope().launch {
+        lifecycleScope.launch {
             val moviesList = repository.loadMovies()
             adapter.submitList(moviesList)
         }

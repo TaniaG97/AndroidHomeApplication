@@ -1,20 +1,21 @@
 package com.android.academy.fundamentals.homework.data
 
 import android.content.Context
+import android.util.Log
 import com.example.androidhomeapplication.data.JsonActor
 import com.example.androidhomeapplication.data.JsonGenre
 import com.example.androidhomeapplication.data.JsonMovie
 import com.example.androidhomeapplication.models.Actor
 import com.example.androidhomeapplication.models.Genre
 import com.example.androidhomeapplication.models.Movie
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.example.androidhomeapplication.readAssetFileToString
+import kotlinx.coroutines.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 interface MovieRepository {
     suspend fun loadMovies(): List<Movie>
-    suspend fun loadMovie(movieId: Int): Movie?
+    suspend fun loadMovie(movieId: Long): Movie?
 }
 
 internal class JsonMovieRepository(private val context: Context) : MovieRepository {
@@ -33,16 +34,24 @@ internal class JsonMovieRepository(private val context: Context) : MovieReposito
         }
     }
 
-    private suspend fun loadMoviesFromJsonFile(): List<Movie> {
-        val genresMap = loadGenres()
-        val actorsMap = loadActors()
+    override suspend fun loadMovie(movieId: Long): Movie?  =  loadMovies().find {movie:Movie ->  movie.id == movieId }
 
-        val data = readAssetFileToString("data.json")
+
+    private suspend fun loadMoviesFromJsonFile(): List<Movie> {
+        var genresMap:List<Genre> = listOf()
+        var actorsMap:List<Actor> = listOf()
+
+        coroutineScope {
+            launch { genresMap = loadGenres() }
+            launch { actorsMap = loadActors() }
+        }
+
+        val data = context.readAssetFileToString("data.json")
         return parseMovies(data, genresMap, actorsMap)
     }
 
     private suspend fun loadGenres(): List<Genre> = withContext(Dispatchers.IO) {
-        val data = readAssetFileToString("genres.json")
+        val data = context.readAssetFileToString("genres.json")
         val jsonGenres = jsonFormat.decodeFromString<List<JsonGenre>>(data)
         jsonGenres.map { jsonGenre ->
             Genre(
@@ -52,15 +61,9 @@ internal class JsonMovieRepository(private val context: Context) : MovieReposito
         }
     }
 
-    private fun readAssetFileToString(fileName: String): String {
-        val stream = context.assets.open(fileName)
-        return stream.bufferedReader().readText()
-    }
-
     private suspend fun loadActors(): List<Actor> = withContext(Dispatchers.IO) {
-        val data = readAssetFileToString("people.json")
+        val data = context.readAssetFileToString("people.json")
         val jsonActors = jsonFormat.decodeFromString<List<JsonActor>>(data)
-
         jsonActors.map { jsonActor ->
             Actor(
                 id = jsonActor.id,
@@ -100,11 +103,6 @@ internal class JsonMovieRepository(private val context: Context) : MovieReposito
                 isLiked = false
             )
         }
-    }
-
-    override suspend fun loadMovie(movieId: Int): Movie? {
-        val cachedMovies = movies ?: loadMovies()
-        return cachedMovies.find { it.id == movieId }
     }
 
     private fun <T : Any> T?.orThrow(createThrowable: () -> Throwable): T {

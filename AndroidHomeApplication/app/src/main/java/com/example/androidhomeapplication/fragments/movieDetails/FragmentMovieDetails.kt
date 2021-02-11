@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.android.academy.fundamentals.homework.data.JsonMovieRepository
@@ -29,10 +30,10 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
 
         initViews()
 
-        val movieId = arguments?.getInt(KEY_MOVIE_ID)
+        val movieId = arguments?.getLong(KEY_MOVIE_ID)
         if (movieId!=null){
             val repository = JsonMovieRepository(requireContext())
-            MainScope().launch {
+            lifecycleScope.launch {
                 val movie = repository.loadMovie(movieId)
                 if (movie != null) {
                     setMovieFields(movie)
@@ -68,12 +69,12 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
 
 }
 
-class MovieDetailsScreen(private val movieId: Int) : FragmentScreen(
+class MovieDetailsScreen(private val movieId: Long) : FragmentScreen(
     key = "MovieDetailsScreen",
     fragmentCreator = { fragmentFactory: FragmentFactory ->
         val fragment = FragmentMovieDetails()
         val args = Bundle(1)
-        args.putInt(KEY_MOVIE_ID, movieId)
+        args.putLong(KEY_MOVIE_ID, movieId)
         fragment.arguments = args
         fragment
     }
