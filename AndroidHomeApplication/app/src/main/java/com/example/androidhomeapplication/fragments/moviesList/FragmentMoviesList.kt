@@ -1,25 +1,25 @@
 package com.example.androidhomeapplication.fragments.moviesList
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.android.academy.fundamentals.homework.data.JsonMovieRepository
+import com.android.academy.fundamentals.homework.data.MovieRepositoryProvider
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.FragmentMoviesListBinding
 import com.example.androidhomeapplication.fragments.movieDetails.MovieDetailsScreen
 import com.example.androidhomeapplication.navigation.RouterProvider
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import java.io.IOException
 
 class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
     private val binding by viewBinding(FragmentMoviesListBinding::bind)
+    private var scope = MainScope()
 
     private val adapter: MoviesListAdapter = MoviesListAdapter(
         onItemClick = { item ->
@@ -34,11 +34,25 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
         updateAdapter()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        scope.cancel()
+    }
+
     private fun updateAdapter() {
-        val repository = JsonMovieRepository(requireContext())
-        lifecycleScope.launch {
-            val moviesList = repository.loadMovies()
-            adapter.submitList(moviesList)
+        scope.launch {
+            try {
+                val moviesList =
+                    (activity?.application as? MovieRepositoryProvider)?.movieRepository?.loadMovies()
+                adapter.submitList(moviesList)
+            } catch (throwable: Throwable) {
+                Toast.makeText(
+                    requireContext(),
+                    "Something was wrong. Look at the logs",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.e("FragmentMoviesList", "updateAdapter: Failed", throwable)
+            }
         }
     }
 }

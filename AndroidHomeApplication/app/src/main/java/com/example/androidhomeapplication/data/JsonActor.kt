@@ -1,5 +1,6 @@
 package com.example.androidhomeapplication.data
 
+import com.example.androidhomeapplication.models.Actor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -10,3 +11,10 @@ internal class JsonActor(
     @SerialName("profile_path")
     val profilePicture: String
 )
+
+internal fun JsonActor.mapToActor(): Actor =
+    Actor(
+        id = this.id,
+        name = this.name,
+        imageUrl = this.profilePicture
+    )

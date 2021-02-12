@@ -1,13 +1,16 @@
 package com.example.androidhomeapplication.fragments.movieDetails
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.android.academy.fundamentals.homework.data.JsonMovieRepository
+import com.android.academy.fundamentals.homework.data.MovieRepositoryProvider
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
 import com.example.androidhomeapplication.loadImageWithGlide
@@ -16,14 +19,14 @@ import com.example.androidhomeapplication.models.Movie
 import com.example.androidhomeapplication.navigation.RouterProvider
 import com.example.androidhomeapplication.setRating
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 private const val KEY_MOVIE_ID = "movie_id"
 
 class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val binding by viewBinding(FragmentMovieDetailsBinding::bind)
     private val adapter: CastsListAdapter = CastsListAdapter()
+    private var scope = MainScope()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -31,15 +34,31 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
         initViews()
 
         val movieId = arguments?.getLong(KEY_MOVIE_ID)
-        if (movieId!=null){
-            val repository = JsonMovieRepository(requireContext())
-            lifecycleScope.launch {
-                val movie = repository.loadMovie(movieId)
-                if (movie != null) {
-                    setMovieFields(movie)
+        if (movieId != null) {
+            scope.launch() {
+                try {
+                    val movie =
+                        (activity?.application as? MovieRepositoryProvider)?.movieRepository?.loadMovie(
+                            movieId
+                        )
+                    if (movie != null) {
+                        setMovieFields(movie)
+                    }
+                } catch (throwable: Throwable) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Something was wrong. Look at the logs",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.e("FragmentMovieDetails", "SetMovieData: Failed", throwable)
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        scope.cancel()
     }
 
     private fun initViews() {
