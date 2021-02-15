@@ -52,7 +52,7 @@ class MovieItemViewHolder(
         binding.itemImage.loadImageWithGlide(itemData.imageUrl)
         binding.itemTextAge.text = itemView.context.getString(R.string.age_template, itemData.pgAge)
         binding.itemIconLike.setImageActiveState(isActive = itemData.isLiked)
-        binding.itemMoveTypes.text = itemData.genres.joinToString(", ") { it.name }
+        binding.itemMoveTypes.text = itemData.genres.joinToString(", ") {genre ->  genre.name }
         binding.itemStars.setRating(itemData.rating)
         binding.itemTextReviews.text = itemView.context?.getString(R.string.reviews_template, itemData.reviewCount)
         binding.itemTextTitle.text = itemData.title

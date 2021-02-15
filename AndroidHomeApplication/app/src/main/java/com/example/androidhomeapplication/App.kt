@@ -11,10 +11,9 @@ import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.Router
 
 class App : Application(), RouterProvider, NavigatorHolderProvider, MovieRepositoryProvider {
-    private val jsonMovieRepository = JsonMovieRepository(this)
     private val cicerone = Cicerone.create()
 
     override val router: Router get() = cicerone.router
     override val navigatorHolder: NavigatorHolder get() = cicerone.getNavigatorHolder()
-    override val movieRepository: MovieRepository get() = jsonMovieRepository
+    override val movieRepository: MovieRepository by lazy { JsonMovieRepository(this) }
 }

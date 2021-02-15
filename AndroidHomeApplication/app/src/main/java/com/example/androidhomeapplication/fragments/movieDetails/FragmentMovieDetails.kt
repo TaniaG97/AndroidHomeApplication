@@ -6,10 +6,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.android.academy.fundamentals.homework.data.JsonMovieRepository
+import com.android.academy.fundamentals.homework.data.MovieRepository
 import com.android.academy.fundamentals.homework.data.MovieRepositoryProvider
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
@@ -26,21 +25,19 @@ private const val KEY_MOVIE_ID = "movie_id"
 class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val binding by viewBinding(FragmentMovieDetailsBinding::bind)
     private val adapter: CastsListAdapter = CastsListAdapter()
-    private var scope = MainScope()
+    private var scope: CoroutineScope? = null
+    private val movieRepository: MovieRepository get() = (activity?.application as MovieRepositoryProvider).movieRepository
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        scope = MainScope()
         initViews()
 
         val movieId = arguments?.getLong(KEY_MOVIE_ID)
         if (movieId != null) {
-            scope.launch() {
+            scope?.launch {
                 try {
-                    val movie =
-                        (activity?.application as? MovieRepositoryProvider)?.movieRepository?.loadMovie(
-                            movieId
-                        )
+                    val movie = movieRepository.getMovie(movieId)
                     if (movie != null) {
                         setMovieFields(movie)
                     }
@@ -57,8 +54,9 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     }
 
     override fun onDestroyView() {
+        scope?.cancel()
+        scope = null
         super.onDestroyView()
-        scope.cancel()
     }
 
     private fun initViews() {
@@ -75,7 +73,7 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
         binding.backgroundImage.loadImageWithGlide(movieData.detailImageUrl)
         binding.textAge.text = context?.getString(R.string.age_template, movieData.pgAge)
         binding.textTitle.text = movieData.title
-        binding.textMoveTypes.text = movieData.genres.joinToString(", ") { it.name }
+        binding.textMoveTypes.text = movieData.genres.joinToString(", ") { genre -> genre.name }
         binding.stars.setRating(movieData.rating)
         binding.textReviews.text = getString(R.string.reviews_template, movieData.reviewCount)
         binding.textStorylineDescription.text = movieData.storyLine

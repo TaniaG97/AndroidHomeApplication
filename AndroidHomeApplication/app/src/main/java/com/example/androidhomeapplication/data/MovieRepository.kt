@@ -16,19 +16,19 @@ import kotlinx.serialization.json.Json
 import java.util.concurrent.atomic.AtomicReference
 
 interface MovieRepository {
-    suspend fun loadMovies(): List<Movie>
-    suspend fun loadMovie(movieId: Long): Movie?
+    suspend fun getMovies(): List<Movie>
+    suspend fun getMovie(movieId: Long): Movie?
 }
 
 internal interface MovieRepositoryProvider {
     val movieRepository: MovieRepository
 }
 
-class JsonMovieRepository(private val context: Context) : MovieRepository {
+internal class JsonMovieRepository(private val context: Context) : MovieRepository {
     private val jsonFormat = Json { ignoreUnknownKeys = true }
     private val movies: AtomicReference<List<Movie>?> = AtomicReference<List<Movie>?>()
 
-    override suspend fun loadMovies(): List<Movie> = withContext(Dispatchers.IO) {
+    override suspend fun getMovies(): List<Movie> = withContext(Dispatchers.IO) {
         val cachedMovies = movies.get()
         if (cachedMovies != null) {
             cachedMovies
@@ -39,8 +39,8 @@ class JsonMovieRepository(private val context: Context) : MovieRepository {
         }
     }
 
-    override suspend fun loadMovie(movieId: Long): Movie? =
-        loadMovies().find { movie: Movie -> movie.id == movieId }
+    override suspend fun getMovie(movieId: Long): Movie? =
+        getMovies().find { movie: Movie -> movie.id == movieId }
 
     private suspend fun loadMoviesFromJsonFile(): List<Movie> = coroutineScope {
         val genresMap = async { loadData(fileName = "genres.json", JsonGenre::mapToGenre) }
@@ -50,10 +50,10 @@ class JsonMovieRepository(private val context: Context) : MovieRepository {
     }
 
     private suspend fun parseMovies(
-        genreData: List<Genre>,
+        genres: List<Genre>,
         actors: List<Actor>
     ): List<Movie> {
-        val genresMap = genreData.associateBy(Genre::id)
+        val genresMap = genres.associateBy(Genre::id)
         val actorsMap = actors.associateBy(Actor::id)
 
         return loadData(fileName = "data.json") { jsonMovie: JsonMovie ->
