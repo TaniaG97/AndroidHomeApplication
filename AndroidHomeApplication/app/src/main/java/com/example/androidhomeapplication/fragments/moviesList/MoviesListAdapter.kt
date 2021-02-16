@@ -28,7 +28,7 @@ class MoviesListAdapter(
     override fun onBindViewHolder(holder: MovieItemViewHolder, position: Int) = holder.bind(getItem(position))
 }
 
-class TaskDiffCallBack : DiffUtil.ItemCallback<Movie>() {
+private class TaskDiffCallBack : DiffUtil.ItemCallback<Movie>() {
     override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean = (oldItem.id == newItem.id)
     override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean = (oldItem === newItem)
 }

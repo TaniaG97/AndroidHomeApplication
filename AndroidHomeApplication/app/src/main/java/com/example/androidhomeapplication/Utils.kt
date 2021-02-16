@@ -5,6 +5,9 @@ import android.content.res.ColorStateList
 import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import com.android.academy.fundamentals.homework.data.MovieRepository
+import com.android.academy.fundamentals.homework.data.MovieRepositoryProvider
 import com.bumptech.glide.Glide
 import com.example.androidhomeapplication.databinding.ViewStarsBinding
 
@@ -50,3 +53,5 @@ fun Context.readAssetFileToString(fileName: String): String {
     val stream = this.assets.open(fileName)
     return stream.bufferedReader().readText()
 }
+
+fun Fragment.getMovieRepository(): MovieRepository = (activity?.application as MovieRepositoryProvider).movieRepository

@@ -12,6 +12,7 @@ import com.android.academy.fundamentals.homework.data.MovieRepository
 import com.android.academy.fundamentals.homework.data.MovieRepositoryProvider
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
+import com.example.androidhomeapplication.getMovieRepository
 import com.example.androidhomeapplication.loadImageWithGlide
 import com.example.androidhomeapplication.models.Actor
 import com.example.androidhomeapplication.models.Movie
@@ -26,31 +27,13 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val binding by viewBinding(FragmentMovieDetailsBinding::bind)
     private val adapter: CastsListAdapter = CastsListAdapter()
     private var scope: CoroutineScope? = null
-    private val movieRepository: MovieRepository get() = (activity?.application as MovieRepositoryProvider).movieRepository
+    private val movieRepository: MovieRepository get() = this.getMovieRepository()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         scope = MainScope()
         initViews()
-
-        val movieId = arguments?.getLong(KEY_MOVIE_ID)
-        if (movieId != null) {
-            scope?.launch {
-                try {
-                    val movie = movieRepository.getMovie(movieId)
-                    if (movie != null) {
-                        setMovieFields(movie)
-                    }
-                } catch (throwable: Throwable) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Something was wrong. Look at the logs",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    Log.e("FragmentMovieDetails", "SetMovieData: Failed", throwable)
-                }
-            }
-        }
+        showMovieDetails()
     }
 
     override fun onDestroyView() {
@@ -82,6 +65,27 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
 
     private fun updateAdapter(castsList: List<Actor>) {
         adapter.submitList(castsList)
+    }
+
+    private fun showMovieDetails() {
+        val movieId = arguments?.getLong(KEY_MOVIE_ID)
+        if (movieId != null) {
+            scope?.launch {
+                try {
+                    val movie = movieRepository.getMovie(movieId)
+                    if (movie != null) {
+                        setMovieFields(movie)
+                    }
+                } catch (throwable: Throwable) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Something was wrong. Look at the logs",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.e("FragmentMovieDetails", "SetMovieData: Failed", throwable)
+                }
+            }
+        }
     }
 
 }

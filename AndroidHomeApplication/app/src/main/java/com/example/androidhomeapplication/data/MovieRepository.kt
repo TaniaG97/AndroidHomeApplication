@@ -43,10 +43,10 @@ internal class JsonMovieRepository(private val context: Context) : MovieReposito
         getMovies().find { movie: Movie -> movie.id == movieId }
 
     private suspend fun loadMoviesFromJsonFile(): List<Movie> = coroutineScope {
-        val genresMap = async { loadData(fileName = "genres.json", JsonGenre::mapToGenre) }
-        val actorsMap = async { loadData(fileName = "people.json", JsonActor::mapToActor) }
+        val genres = async { loadData(fileName = "genres.json", JsonGenre::mapToGenre) }
+        val actors = async { loadData(fileName = "people.json", JsonActor::mapToActor) }
 
-        parseMovies(genresMap.await(), actorsMap.await())
+        parseMovies(genres.await(), actors.await())
     }
 
     private suspend fun parseMovies(

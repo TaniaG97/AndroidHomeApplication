@@ -13,6 +13,7 @@ import com.android.academy.fundamentals.homework.data.MovieRepositoryProvider
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.FragmentMoviesListBinding
 import com.example.androidhomeapplication.fragments.movieDetails.MovieDetailsScreen
+import com.example.androidhomeapplication.getMovieRepository
 import com.example.androidhomeapplication.navigation.RouterProvider
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import kotlinx.coroutines.*
@@ -20,7 +21,7 @@ import kotlinx.coroutines.*
 class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
     private val binding by viewBinding(FragmentMoviesListBinding::bind)
     private var scope: CoroutineScope? = null
-    private val movieRepository: MovieRepository get() = (activity?.application as MovieRepositoryProvider).movieRepository
+    private val movieRepository: MovieRepository get() = this.getMovieRepository()
 
     private val adapter: MoviesListAdapter = MoviesListAdapter(
         onItemClick = { item ->
@@ -33,7 +34,7 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
 
         binding.cinemaRv.layoutManager = GridLayoutManager(context, 2)
         binding.cinemaRv.adapter = adapter
-        updateAdapter()
+        showMoviesList()
     }
 
     override fun onDestroyView() {
@@ -42,7 +43,7 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
         super.onDestroyView()
     }
 
-    private fun updateAdapter() {
+    private fun showMoviesList() {
         scope?.launch {
             try {
                 val moviesList = movieRepository.getMovies()
