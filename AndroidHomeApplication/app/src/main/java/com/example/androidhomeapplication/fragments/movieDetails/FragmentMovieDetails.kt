@@ -1,36 +1,41 @@
 package com.example.androidhomeapplication.fragments.movieDetails
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.example.androidhomeapplication.DataGenerator
-import com.example.androidhomeapplication.R
+import com.android.academy.fundamentals.homework.data.MovieRepository
+import com.android.academy.fundamentals.homework.data.MovieRepositoryProvider
+import com.example.androidhomeapplication.*
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
-import com.example.androidhomeapplication.models.CastData
-import com.example.androidhomeapplication.models.MovieData
+import com.example.androidhomeapplication.models.Actor
+import com.example.androidhomeapplication.models.Movie
 import com.example.androidhomeapplication.navigation.RouterProvider
-import com.example.androidhomeapplication.setRating
 import com.github.terrakok.cicerone.androidx.FragmentScreen
+import kotlinx.coroutines.*
 
 private const val KEY_MOVIE_ID = "movie_id"
 
 class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val binding by viewBinding(FragmentMovieDetailsBinding::bind)
     private val adapter: CastsListAdapter = CastsListAdapter()
+    private var scope: CoroutineScope? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        scope = MainScope()
         initViews()
+        showMovieDetails()
+    }
 
-        val movieId = arguments?.getLong(KEY_MOVIE_ID)
-        val movieData = DataGenerator.getMoviesList().find { it.id == movieId }
-        if (movieData != null) {
-            setMovieFields(movieData)
-        }
+    override fun onDestroyView() {
+        scope?.cancel()
+        scope = null
+        super.onDestroyView()
     }
 
     private fun initViews() {
@@ -43,20 +48,42 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
         }
     }
 
-    private fun setMovieFields(movieData: MovieData) {
-        binding.backgroundImage.setImageResource(movieData.detailPosterResId)
-        binding.textAge.text = context?.getString(R.string.age_template, movieData.ageLimit)
+    private fun setMovieFields(movieData: Movie) {
+        binding.backgroundImage.loadImageWithGlide(movieData.detailImageUrl)
+        binding.textAge.text = context?.getString(R.string.age_template, movieData.pgAge)
         binding.textTitle.text = movieData.title
-        binding.textMoveTypes.text = movieData.genresList.joinToString(", ")
-        binding.stars.setRating(movieData.starCount)
+        binding.textMoveTypes.text = movieData.genres.joinToString(", ") { genre -> genre.name }
+        binding.stars.setRating(movieData.rating)
         binding.textReviews.text = getString(R.string.reviews_template, movieData.reviewCount)
-        binding.textStorylineDescription.text = movieData.description
-        updateAdapter(movieData.castList)
+        binding.textStorylineDescription.text = movieData.storyLine
+        updateAdapter(movieData.actors)
     }
 
-    private fun updateAdapter(castsList: List<CastData>) {
+    private fun updateAdapter(castsList: List<Actor>) {
         adapter.submitList(castsList)
     }
+
+    private fun showMovieDetails() {
+        val movieId = arguments?.getLong(KEY_MOVIE_ID)
+        if (movieId != null) {
+            scope?.launch {
+                try {
+                    val movie = movieRepository.getMovie(movieId)
+                    if (movie != null) {
+                        setMovieFields(movie)
+                    }
+                } catch (throwable: Throwable) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Something was wrong. Look at the logs",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.e("FragmentMovieDetails", "SetMovieData: Failed", throwable)
+                }
+            }
+        }
+    }
+
 }
 
 class MovieDetailsScreen(private val movieId: Long) : FragmentScreen(
