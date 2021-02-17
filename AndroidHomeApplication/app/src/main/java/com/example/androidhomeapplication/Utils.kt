@@ -54,4 +54,4 @@ fun Context.readAssetFileToString(fileName: String): String {
     return stream.bufferedReader().readText()
 }
 
-fun Fragment.getMovieRepository(): MovieRepository = (activity?.application as MovieRepositoryProvider).movieRepository
+val Fragment.movieRepository: MovieRepository get() = (activity?.application as MovieRepositoryProvider).movieRepository

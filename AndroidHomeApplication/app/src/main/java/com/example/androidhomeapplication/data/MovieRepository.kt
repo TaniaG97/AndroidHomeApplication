@@ -20,11 +20,11 @@ interface MovieRepository {
     suspend fun getMovie(movieId: Long): Movie?
 }
 
-internal interface MovieRepositoryProvider {
+interface MovieRepositoryProvider {
     val movieRepository: MovieRepository
 }
 
-internal class JsonMovieRepository(private val context: Context) : MovieRepository {
+class JsonMovieRepository(private val context: Context) : MovieRepository {
     private val jsonFormat = Json { ignoreUnknownKeys = true }
     private val movies: AtomicReference<List<Movie>?> = AtomicReference<List<Movie>?>()
 

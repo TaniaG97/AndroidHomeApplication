@@ -10,14 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.android.academy.fundamentals.homework.data.MovieRepository
 import com.android.academy.fundamentals.homework.data.MovieRepositoryProvider
-import com.example.androidhomeapplication.R
+import com.example.androidhomeapplication.*
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
-import com.example.androidhomeapplication.getMovieRepository
-import com.example.androidhomeapplication.loadImageWithGlide
 import com.example.androidhomeapplication.models.Actor
 import com.example.androidhomeapplication.models.Movie
 import com.example.androidhomeapplication.navigation.RouterProvider
-import com.example.androidhomeapplication.setRating
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import kotlinx.coroutines.*
 
@@ -27,7 +24,6 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val binding by viewBinding(FragmentMovieDetailsBinding::bind)
     private val adapter: CastsListAdapter = CastsListAdapter()
     private var scope: CoroutineScope? = null
-    private val movieRepository: MovieRepository get() = this.getMovieRepository()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
