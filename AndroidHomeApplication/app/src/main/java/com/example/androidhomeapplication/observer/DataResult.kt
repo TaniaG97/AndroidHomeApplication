@@ -2,13 +2,6 @@ package com.example.androidhomeapplication.observer
 
 
 class DataResult<T> {
-
-    companion object {
-        fun <T> inProgress(): DataResult<T> {
-            return DataResult(State.IN_PROGRESS)
-        }
-    }
-
     var data: T? = null
     var state: State? = null
 
@@ -26,9 +19,4 @@ class DataResult<T> {
     constructor(state: State) {
         this.state = state
     }
-
-    fun isSuccessful(): Boolean {
-        return state == State.SUCCESSFUL
-    }
-
 }

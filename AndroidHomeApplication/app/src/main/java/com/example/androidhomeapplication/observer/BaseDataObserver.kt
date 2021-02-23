@@ -11,8 +11,6 @@ open class BaseDataObserver<T> : Observer<DataResult<T>> {
                 dataResult.state == DataResult.State.SUCCESSFUL -> {
                     if (dataResult.data != null) {
                         onData(dataResult.data!!)
-                    } else {
-                        onData()
                     }
                     onDone()
                 }
@@ -25,9 +23,6 @@ open class BaseDataObserver<T> : Observer<DataResult<T>> {
     }
 
     open fun onInProgress() {
-    }
-
-    open fun onData() {
     }
 
     open fun onData(data: T) {
