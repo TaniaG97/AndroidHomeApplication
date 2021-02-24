@@ -45,11 +45,11 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
                 adapter.submitList(result.value)
             }
             is DataResult.EmptyResult -> {
-                showShortToast(getString(R.string.empty_movies_list))
+                showShortToast(R.string.empty_movies_list)
             }
             is DataResult.Error -> {
                 Log.e("FragmentMoviesList", "getMoviesList: Failed", result.error)
-                showShortToast(getString(R.string.something_wrong))
+                showShortToast(R.string.something_wrong)
             }
         }
 }

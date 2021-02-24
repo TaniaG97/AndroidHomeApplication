@@ -54,11 +54,11 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
                 setMovieFields(result.value)
             }
             is DataResult.EmptyResult -> {
-                showShortToast(getString(R.string.empty_movie_details))
+                showShortToast(R.string.empty_movie_details)
             }
             is DataResult.Error -> {
                 Log.e("FragmentMovieDetails", "getMoviesList: Failed", result.error)
-                showShortToast(getString(R.string.something_wrong))
+                showShortToast(R.string.something_wrong)
             }
         }
 
