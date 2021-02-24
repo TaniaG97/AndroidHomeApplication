@@ -9,27 +9,25 @@ import kotlinx.coroutines.launch
 
 class MovieDetailsViewModel(
     private val movieRepository: MovieRepository,
-    private val movieId: Long?
+    private val movieId: Long
 ) : ViewModel() {
 
-    private val mutableMovie = MutableLiveData<DataResult<Movie>>(DataResult.Default())
+    private val mutableMovie = MutableLiveData<DataResult<Movie>>()
     val movie: LiveData<DataResult<Movie>> get() = mutableMovie
 
     init {
-        if (movieId != null) {
-            getMovieDetails(movieId)
-        }
+        getMovieDetails()
     }
 
-    fun getMovieDetails(movieId: Long) {
+    private fun getMovieDetails() {
         mutableMovie.value = DataResult.Loading()
 
         viewModelScope.launch {
             mutableMovie.value = try {
-                var result = movieRepository.getMovie(movieId)
-                if (result!=null){
+                val result = movieRepository.getMovie(movieId)
+                if (result != null) {
                     DataResult.Success(result)
-                }else{
+                } else {
                     DataResult.EmptyResult()
                 }
 
@@ -43,7 +41,7 @@ class MovieDetailsViewModel(
 
 class MovieDetailsViewModelFactory(
     private val movieRepository: MovieRepository,
-    private val movieId: Long?
+    private val movieId: Long
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")

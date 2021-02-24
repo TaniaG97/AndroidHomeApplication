@@ -8,4 +8,7 @@
     <string name="age_template">%1$d+</string>
     <string name="reviews_template">%1$d Reviews</string>
     <string name="time_template">%1$d min</string>
+    <string name="empty_movies_list">Movies list is empty</string>
+    <string name="something_wrong">Something was wrong. Look at the logs</string>
+    <string name="empty_movie_details">Movies Details is empty</string>
 </resources>

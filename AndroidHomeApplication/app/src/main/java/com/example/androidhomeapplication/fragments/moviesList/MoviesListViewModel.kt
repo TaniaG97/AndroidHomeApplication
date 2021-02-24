@@ -11,10 +11,14 @@ class MoviesListViewModel(
     private val movieRepository: MovieRepository
 ) : ViewModel() {
 
-    private val mutableMovieList = MutableLiveData<DataResult<List<Movie>>>(DataResult.Default())
+    private val mutableMovieList = MutableLiveData<DataResult<List<Movie>>>()
     val moviesList: LiveData<DataResult<List<Movie>>> get() = mutableMovieList
 
-    fun getMoviesList() {
+    init {
+        getMoviesList()
+    }
+
+    private fun getMoviesList() {
         mutableMovieList.value = DataResult.Loading()
 
         viewModelScope.launch {

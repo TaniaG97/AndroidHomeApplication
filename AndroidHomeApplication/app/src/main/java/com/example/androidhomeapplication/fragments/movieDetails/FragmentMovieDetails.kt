@@ -24,7 +24,7 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val viewModel: MovieDetailsViewModel by viewModels {
         MovieDetailsViewModelFactory(
             movieRepository,
-            arguments?.getLong(KEY_MOVIE_ID)
+            arguments?.getLong(KEY_MOVIE_ID)!!
         )
     }
 
@@ -32,7 +32,8 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
         super.onViewCreated(view, savedInstanceState)
 
         initViews()
-        setupObservers()
+
+        viewModel.movie.observe(viewLifecycleOwner, ::setResult)
     }
 
     private fun initViews() {
@@ -45,38 +46,21 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
         }
     }
 
-    private fun setupObservers() {
-
-        viewModel.movie.observe(
-            viewLifecycleOwner,
-            {result: DataResult<Movie> ->
-                when (result) {
-                    is DataResult.Default -> {
-                    }
-                    is DataResult.Loading -> {
-                    }
-                    is DataResult.Success<Movie> -> {
-                        setMovieFields(result.value)
-                    }
-                    is DataResult.EmptyResult -> {
-                        Toast.makeText(
-                            requireContext(),
-                            "Movies Details is empty",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    is DataResult.Error -> {
-                        Log.e("FragmentMovieDetails", "getMoviesList: Failed", result.error)
-                        Toast.makeText(
-                            requireContext(),
-                            "Something was wrong. Look at the logs",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+    private fun setResult(result: DataResult<Movie>) =
+        when (result) {
+            is DataResult.Loading -> {
             }
-        )
-    }
+            is DataResult.Success<Movie> -> {
+                setMovieFields(result.value)
+            }
+            is DataResult.EmptyResult -> {
+                showShortToast(getString(R.string.empty_movie_details))
+            }
+            is DataResult.Error -> {
+                Log.e("FragmentMovieDetails", "getMoviesList: Failed", result.error)
+                showShortToast(getString(R.string.something_wrong))
+            }
+        }
 
     private fun setMovieFields(movieData: Movie) {
         binding.backgroundImage.loadImageWithGlide(movieData.detailImageUrl)

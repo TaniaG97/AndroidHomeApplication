@@ -16,15 +16,12 @@ import com.example.androidhomeapplication.fragments.movieDetails.MovieDetailsScr
 import com.example.androidhomeapplication.models.Movie
 import com.example.androidhomeapplication.movieRepository
 import com.example.androidhomeapplication.navigation.RouterProvider
+import com.example.androidhomeapplication.showShortToast
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
 class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
     private val binding by viewBinding(FragmentMoviesListBinding::bind)
-    private val viewModel: MoviesListViewModel by viewModels {
-        MoviesListViewModelFactory(
-            movieRepository
-        )
-    }
+    private val viewModel: MoviesListViewModel by viewModels {MoviesListViewModelFactory(movieRepository)}
 
     private val adapter: MoviesListAdapter = MoviesListAdapter(
         onItemClick = { item ->
@@ -34,45 +31,27 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupObservers()
-
         binding.cinemaRv.layoutManager = GridLayoutManager(context, 2)
         binding.cinemaRv.adapter = adapter
-        viewModel.getMoviesList()
+
+        viewModel.moviesList.observe(viewLifecycleOwner, ::setResult)
     }
 
-    private fun setupObservers() {
-
-        viewModel.moviesList.observe(
-            viewLifecycleOwner,
-            {result: DataResult<List<Movie>> ->
-                when (result) {
-                    is DataResult.Default -> {
-                    }
-                    is DataResult.Loading -> {
-                    }
-                    is DataResult.Success<List<Movie>> -> {
-                        adapter.submitList(result.value)
-                    }
-                    is DataResult.EmptyResult -> {
-                        Toast.makeText(
-                            requireContext(),
-                            "Movies list is empty",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    is DataResult.Error -> {
-                        Log.e("FragmentMoviesList", "getMoviesList: Failed", result.error)
-                        Toast.makeText(
-                            requireContext(),
-                            "Something was wrong. Look at the logs",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+    private fun setResult(result: DataResult<List<Movie>>) =
+        when (result) {
+            is DataResult.Loading -> {
             }
-        )
-    }
+            is DataResult.Success<List<Movie>> -> {
+                adapter.submitList(result.value)
+            }
+            is DataResult.EmptyResult -> {
+                showShortToast(getString(R.string.empty_movies_list))
+            }
+            is DataResult.Error -> {
+                Log.e("FragmentMoviesList", "getMoviesList: Failed", result.error)
+                showShortToast(getString(R.string.something_wrong))
+            }
+        }
 }
 
 class MoviesListScreen : FragmentScreen(
