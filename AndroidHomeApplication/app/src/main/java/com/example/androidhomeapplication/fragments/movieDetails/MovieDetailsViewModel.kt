@@ -1,45 +1,54 @@
 package com.example.androidhomeapplication.fragments.movieDetails
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.*
 import com.android.academy.fundamentals.homework.data.MovieRepository
+import com.example.androidhomeapplication.DataResult
 import com.example.androidhomeapplication.models.Movie
-import com.example.androidhomeapplication.observer.DataResult
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MovieDetailsViewModel(
-    private val movieRepository: MovieRepository
+    private val movieRepository: MovieRepository,
+    private val movieId: Long?
 ) : ViewModel() {
 
-    private val _mutableMovie = MutableLiveData<DataResult<Movie>>()
-    val movie: LiveData<DataResult<Movie>> get() = _mutableMovie
+    private val mutableMovie = MutableLiveData<DataResult<Movie>>(DataResult.Default())
+    val movie: LiveData<DataResult<Movie>> get() = mutableMovie
 
-    fun getMovieDetails(movieId:Long) {
-        _mutableMovie.value = DataResult(DataResult.State.IN_PROGRESS)
+    init {
+        if (movieId != null) {
+            getMovieDetails(movieId)
+        }
+    }
+
+    fun getMovieDetails(movieId: Long) {
+        mutableMovie.value = DataResult.Loading()
 
         viewModelScope.launch {
-            try {
-                val result = movieRepository.getMovie(movieId)
-                _mutableMovie.value = DataResult(result)
+            mutableMovie.value = try {
+                var result = movieRepository.getMovie(movieId)
+                if (result!=null){
+                    DataResult.Success(result)
+                }else{
+                    DataResult.EmptyResult()
+                }
 
             } catch (throwable: Throwable) {
-                _mutableMovie.value = DataResult(DataResult.State.ERROR)
                 Log.e("MovieDetailsViewModel", "getMovieDetails: Failed", throwable)
+                DataResult.Error(throwable)
             }
         }
     }
 }
 
 class MovieDetailsViewModelFactory(
-    private val movieRepository: MovieRepository
+    private val movieRepository: MovieRepository,
+    private val movieId: Long?
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T = when (modelClass) {
-        MovieDetailsViewModel::class.java -> MovieDetailsViewModel(movieRepository)
+        MovieDetailsViewModel::class.java -> MovieDetailsViewModel(movieRepository, movieId)
         else -> throw IllegalArgumentException("$modelClass is not registered ViewModel")
     } as T
 }

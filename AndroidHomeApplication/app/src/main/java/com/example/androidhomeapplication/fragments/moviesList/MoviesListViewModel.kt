@@ -1,31 +1,27 @@
 package com.example.androidhomeapplication.fragments.moviesList
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.*
 import com.android.academy.fundamentals.homework.data.MovieRepository
+import com.example.androidhomeapplication.DataResult
 import com.example.androidhomeapplication.models.Movie
-import com.example.androidhomeapplication.movieRepository
-import com.example.androidhomeapplication.observer.DataResult
 import kotlinx.coroutines.launch
 
 class MoviesListViewModel(
     private val movieRepository: MovieRepository
 ) : ViewModel() {
 
-    private val _mutableMovieList = MutableLiveData<DataResult<List<Movie>>>()
-    val moviesList: LiveData<DataResult<List<Movie>>> get() = _mutableMovieList
+    private val mutableMovieList = MutableLiveData<DataResult<List<Movie>>>(DataResult.Default())
+    val moviesList: LiveData<DataResult<List<Movie>>> get() = mutableMovieList
 
     fun getMoviesList() {
-        _mutableMovieList.value = DataResult(DataResult.State.IN_PROGRESS)
+        mutableMovieList.value = DataResult.Loading()
 
         viewModelScope.launch {
-            try {
-                val result = movieRepository.getMovies()
-                _mutableMovieList.value = DataResult(result)
+            mutableMovieList.value = try {
+                DataResult.Success(movieRepository.getMovies())
             } catch (throwable: Throwable) {
-                _mutableMovieList.value = DataResult(DataResult.State.ERROR)
-                Log.e("MoviesListViewModel", "getMoviesList: Failed", throwable)
+                DataResult.Error(throwable)
             }
         }
     }

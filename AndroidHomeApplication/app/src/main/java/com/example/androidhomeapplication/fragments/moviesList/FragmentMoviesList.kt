@@ -9,21 +9,22 @@ import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.example.androidhomeapplication.DataResult
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.FragmentMoviesListBinding
 import com.example.androidhomeapplication.fragments.movieDetails.MovieDetailsScreen
-import com.example.androidhomeapplication.fragments.movieDetails.MovieDetailsViewModel
-import com.example.androidhomeapplication.fragments.movieDetails.MovieDetailsViewModelFactory
 import com.example.androidhomeapplication.models.Movie
 import com.example.androidhomeapplication.movieRepository
 import com.example.androidhomeapplication.navigation.RouterProvider
-import com.example.androidhomeapplication.observer.BaseDataObserver
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-import kotlinx.coroutines.*
 
 class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
     private val binding by viewBinding(FragmentMoviesListBinding::bind)
-    private val viewModel: MoviesListViewModel by viewModels { MoviesListViewModelFactory(movieRepository) }
+    private val viewModel: MoviesListViewModel by viewModels {
+        MoviesListViewModelFactory(
+            movieRepository
+        )
+    }
 
     private val adapter: MoviesListAdapter = MoviesListAdapter(
         onItemClick = { item ->
@@ -44,24 +45,30 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
 
         viewModel.moviesList.observe(
             viewLifecycleOwner,
-            object : BaseDataObserver<List<Movie>>() {
-
-                override fun onInProgress() {
-                    Log.d("FragmentMoviesList", "onInProgress")
-                }
-
-                override fun onData(data: List<Movie>) {
-                    Log.d("FragmentMoviesList", "SUCCESS: ")
-                    adapter.submitList(data)
-                }
-
-                override fun onError() {
-                    Log.d("FragmentMoviesList", "ERROR")
-                    Toast.makeText(
-                        requireContext(),
-                        "Something was wrong. Look at the logs",
-                        Toast.LENGTH_SHORT
-                    ).show()
+            {result: DataResult<List<Movie>> ->
+                when (result) {
+                    is DataResult.Default -> {
+                    }
+                    is DataResult.Loading -> {
+                    }
+                    is DataResult.Success<List<Movie>> -> {
+                        adapter.submitList(result.value)
+                    }
+                    is DataResult.EmptyResult -> {
+                        Toast.makeText(
+                            requireContext(),
+                            "Movies list is empty",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    is DataResult.Error -> {
+                        Log.e("FragmentMoviesList", "getMoviesList: Failed", result.error)
+                        Toast.makeText(
+                            requireContext(),
+                            "Something was wrong. Look at the logs",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         )

@@ -7,34 +7,32 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.android.academy.fundamentals.homework.data.MovieRepository
-import com.android.academy.fundamentals.homework.data.MovieRepositoryProvider
 import com.example.androidhomeapplication.*
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
 import com.example.androidhomeapplication.models.Actor
 import com.example.androidhomeapplication.models.Movie
 import com.example.androidhomeapplication.navigation.RouterProvider
-import com.example.androidhomeapplication.observer.BaseDataObserver
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-import kotlinx.coroutines.*
 
 private const val KEY_MOVIE_ID = "movie_id"
 
 class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val binding by viewBinding(FragmentMovieDetailsBinding::bind)
     private val adapter: CastsListAdapter = CastsListAdapter()
-    private val viewModel: MovieDetailsViewModel by viewModels { MovieDetailsViewModelFactory(movieRepository) }
+    private val viewModel: MovieDetailsViewModel by viewModels {
+        MovieDetailsViewModelFactory(
+            movieRepository,
+            arguments?.getLong(KEY_MOVIE_ID)
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initViews()
         setupObservers()
-
-        getMovieDetails()
     }
 
     private fun initViews() {
@@ -51,34 +49,33 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
 
         viewModel.movie.observe(
             viewLifecycleOwner,
-            object : BaseDataObserver<Movie>() {
-
-                override fun onInProgress() {
-                    Log.d("FragmentMovieDetails", "onInProgress")
-                }
-
-                override fun onData(data: Movie) {
-                    Log.d("FragmentMovieDetails", "SUCCESS: ")
-                    setMovieFields(data)
-                }
-
-                override fun onError() {
-                    Log.d("FragmentMovieDetails", "ERROR")
-                    Toast.makeText(
-                        requireContext(),
-                        "Something was wrong. Look at the logs",
-                        Toast.LENGTH_SHORT
-                    ).show()
+            {result: DataResult<Movie> ->
+                when (result) {
+                    is DataResult.Default -> {
+                    }
+                    is DataResult.Loading -> {
+                    }
+                    is DataResult.Success<Movie> -> {
+                        setMovieFields(result.value)
+                    }
+                    is DataResult.EmptyResult -> {
+                        Toast.makeText(
+                            requireContext(),
+                            "Movies Details is empty",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    is DataResult.Error -> {
+                        Log.e("FragmentMovieDetails", "getMoviesList: Failed", result.error)
+                        Toast.makeText(
+                            requireContext(),
+                            "Something was wrong. Look at the logs",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         )
-    }
-
-    private fun getMovieDetails() {
-        val movieId = arguments?.getLong(KEY_MOVIE_ID)
-        if (movieId!=null){
-            viewModel.getMovieDetails(movieId)
-        }
     }
 
     private fun setMovieFields(movieData: Movie) {
