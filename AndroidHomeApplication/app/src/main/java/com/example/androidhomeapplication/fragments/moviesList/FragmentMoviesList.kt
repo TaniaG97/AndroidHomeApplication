@@ -39,8 +39,6 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
 
     private fun setResult(result: DataResult<List<Movie>>) =
         when (result) {
-            is DataResult.Loading -> {
-            }
             is DataResult.Success<List<Movie>> -> {
                 adapter.submitList(result.value)
             }
@@ -51,6 +49,7 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
                 Log.e("FragmentMoviesList", "getMoviesList: Failed", result.error)
                 showShortToast(R.string.something_wrong)
             }
+            is DataResult.Loading -> Unit
         }
 }
 

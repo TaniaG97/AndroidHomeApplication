@@ -48,8 +48,6 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
 
     private fun setResult(result: DataResult<Movie>) =
         when (result) {
-            is DataResult.Loading -> {
-            }
             is DataResult.Success<Movie> -> {
                 setMovieFields(result.value)
             }
@@ -60,6 +58,7 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
                 Log.e("FragmentMovieDetails", "getMoviesList: Failed", result.error)
                 showShortToast(R.string.something_wrong)
             }
+            is DataResult.Loading -> Unit
         }
 
     private fun setMovieFields(movieData: Movie) {
