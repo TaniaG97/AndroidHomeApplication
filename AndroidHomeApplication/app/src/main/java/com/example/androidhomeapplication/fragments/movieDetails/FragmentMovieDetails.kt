@@ -6,36 +6,34 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.android.academy.fundamentals.homework.data.MovieRepository
-import com.android.academy.fundamentals.homework.data.MovieRepositoryProvider
 import com.example.androidhomeapplication.*
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
 import com.example.androidhomeapplication.models.Actor
 import com.example.androidhomeapplication.models.Movie
 import com.example.androidhomeapplication.navigation.RouterProvider
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-import kotlinx.coroutines.*
 
 private const val KEY_MOVIE_ID = "movie_id"
 
 class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val binding by viewBinding(FragmentMovieDetailsBinding::bind)
     private val adapter: CastsListAdapter = CastsListAdapter()
-    private var scope: CoroutineScope? = null
+    private val viewModel: MovieDetailsViewModel by viewModels {
+        MovieDetailsViewModelFactory(
+            movieRepository,
+            arguments?.getLong(KEY_MOVIE_ID)!!
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        scope = MainScope()
-        initViews()
-        showMovieDetails()
-    }
 
-    override fun onDestroyView() {
-        scope?.cancel()
-        scope = null
-        super.onDestroyView()
+        initViews()
+
+        viewModel.movie.observe(viewLifecycleOwner, ::setResult)
     }
 
     private fun initViews() {
@@ -47,6 +45,21 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
             (activity?.application as? RouterProvider)?.router?.exit()
         }
     }
+
+    private fun setResult(result: DataResult<Movie>) =
+        when (result) {
+            is DataResult.Success<Movie> -> {
+                setMovieFields(result.value)
+            }
+            is DataResult.EmptyResult -> {
+                showShortToast(R.string.empty_movie_details)
+            }
+            is DataResult.Error -> {
+                Log.e("FragmentMovieDetails", "getMoviesList: Failed", result.error)
+                showShortToast(R.string.something_wrong)
+            }
+            is DataResult.Loading -> Unit
+        }
 
     private fun setMovieFields(movieData: Movie) {
         binding.backgroundImage.loadImageWithGlide(movieData.detailImageUrl)
@@ -62,28 +75,6 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private fun updateAdapter(castsList: List<Actor>) {
         adapter.submitList(castsList)
     }
-
-    private fun showMovieDetails() {
-        val movieId = arguments?.getLong(KEY_MOVIE_ID)
-        if (movieId != null) {
-            scope?.launch {
-                try {
-                    val movie = movieRepository.getMovie(movieId)
-                    if (movie != null) {
-                        setMovieFields(movie)
-                    }
-                } catch (throwable: Throwable) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Something was wrong. Look at the logs",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    Log.e("FragmentMovieDetails", "SetMovieData: Failed", throwable)
-                }
-            }
-        }
-    }
-
 }
 
 class MovieDetailsScreen(private val movieId: Long) : FragmentScreen(

@@ -6,19 +6,22 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.example.androidhomeapplication.DataResult
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.FragmentMoviesListBinding
 import com.example.androidhomeapplication.fragments.movieDetails.MovieDetailsScreen
+import com.example.androidhomeapplication.models.Movie
 import com.example.androidhomeapplication.movieRepository
 import com.example.androidhomeapplication.navigation.RouterProvider
+import com.example.androidhomeapplication.showShortToast
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-import kotlinx.coroutines.*
 
 class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
     private val binding by viewBinding(FragmentMoviesListBinding::bind)
-    private var scope: CoroutineScope? = null
+    private val viewModel: MoviesListViewModel by viewModels {MoviesListViewModelFactory(movieRepository)}
 
     private val adapter: MoviesListAdapter = MoviesListAdapter(
         onItemClick = { item ->
@@ -27,34 +30,27 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        scope = MainScope()
 
         binding.cinemaRv.layoutManager = GridLayoutManager(context, 2)
         binding.cinemaRv.adapter = adapter
-        showMoviesList()
+
+        viewModel.moviesList.observe(viewLifecycleOwner, ::setResult)
     }
 
-    override fun onDestroyView() {
-        scope?.cancel()
-        scope = null
-        super.onDestroyView()
-    }
-
-    private fun showMoviesList() {
-        scope?.launch {
-            try {
-                val moviesList = movieRepository.getMovies()
-                adapter.submitList(moviesList)
-            } catch (throwable: Throwable) {
-                Toast.makeText(
-                    requireContext(),
-                    "Something was wrong. Look at the logs",
-                    Toast.LENGTH_SHORT
-                ).show()
-                Log.e("FragmentMoviesList", "updateAdapter: Failed", throwable)
+    private fun setResult(result: DataResult<List<Movie>>) =
+        when (result) {
+            is DataResult.Success<List<Movie>> -> {
+                adapter.submitList(result.value)
             }
+            is DataResult.EmptyResult -> {
+                showShortToast(R.string.empty_movies_list)
+            }
+            is DataResult.Error -> {
+                Log.e("FragmentMoviesList", "getMoviesList: Failed", result.error)
+                showShortToast(R.string.something_wrong)
+            }
+            is DataResult.Loading -> Unit
         }
-    }
 }
 
 class MoviesListScreen : FragmentScreen(

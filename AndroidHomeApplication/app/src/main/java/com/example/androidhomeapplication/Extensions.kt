@@ -3,7 +3,9 @@ package com.example.androidhomeapplication
 import android.content.Context
 import android.content.res.ColorStateList
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.android.academy.fundamentals.homework.data.MovieRepository
@@ -55,3 +57,12 @@ fun Context.readAssetFileToString(fileName: String): String {
 }
 
 val Fragment.movieRepository: MovieRepository get() = (activity?.application as MovieRepositoryProvider).movieRepository
+
+fun Fragment.showShortToast(msg: String) =
+    Toast.makeText(
+        requireContext(),
+        msg,
+        Toast.LENGTH_SHORT
+    ).show()
+
+fun Fragment.showShortToast(@StringRes msgResId: Int) = this.showShortToast(getString(msgResId))
