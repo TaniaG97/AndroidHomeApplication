@@ -1,9 +1,8 @@
-package com.example.androidhomeapplication.fragments.movieDetails
+package com.example.androidhomeapplication.ui.movieDetails
 
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.viewModels
@@ -11,8 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.androidhomeapplication.*
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
-import com.example.androidhomeapplication.models.Actor
-import com.example.androidhomeapplication.models.Movie
+import com.example.androidhomeapplication.data.models.Actor
+import com.example.androidhomeapplication.data.models.Movie
+import com.example.androidhomeapplication.data.models.MovieDetails
 import com.example.androidhomeapplication.navigation.RouterProvider
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
@@ -24,7 +24,7 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val viewModel: MovieDetailsViewModel by viewModels {
         MovieDetailsViewModelFactory(
             movieRepository,
-            arguments?.getLong(KEY_MOVIE_ID)!!
+            arguments?.getInt(KEY_MOVIE_ID)!!
         )
     }
 
@@ -46,9 +46,9 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
         }
     }
 
-    private fun setResult(result: DataResult<Movie>) =
+    private fun setResult(result: DataResult<MovieDetails>) =
         when (result) {
-            is DataResult.Success<Movie> -> {
+            is DataResult.Success<MovieDetails> -> {
                 setMovieFields(result.value)
             }
             is DataResult.EmptyResult -> {
@@ -61,7 +61,7 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
             is DataResult.Loading -> Unit
         }
 
-    private fun setMovieFields(movieData: Movie) {
+    private fun setMovieFields(movieData: MovieDetails) {
         binding.backgroundImage.loadImageWithGlide(movieData.detailImageUrl)
         binding.textAge.text = context?.getString(R.string.age_template, movieData.pgAge)
         binding.textTitle.text = movieData.title
@@ -77,12 +77,12 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     }
 }
 
-class MovieDetailsScreen(private val movieId: Long) : FragmentScreen(
+class MovieDetailsScreen(private val movieId: Int) : FragmentScreen(
     key = "MovieDetailsScreen",
     fragmentCreator = { fragmentFactory: FragmentFactory ->
         val fragment = FragmentMovieDetails()
         val args = Bundle(1)
-        args.putLong(KEY_MOVIE_ID, movieId)
+        args.putInt(KEY_MOVIE_ID, movieId)
         fragment.arguments = args
         fragment
     }

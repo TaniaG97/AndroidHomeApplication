@@ -1,4 +1,4 @@
-package com.example.androidhomeapplication.fragments.moviesList
+package com.example.androidhomeapplication.ui.moviesList
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,11 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.bumptech.glide.Glide
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.ItemMoviesListBinding
 import com.example.androidhomeapplication.loadImageWithGlide
-import com.example.androidhomeapplication.models.Movie
+import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.setImageActiveState
 import com.example.androidhomeapplication.setRating
 
@@ -56,6 +55,6 @@ class MovieItemViewHolder(
         binding.itemStars.setRating(itemData.rating)
         binding.itemTextReviews.text = itemView.context?.getString(R.string.reviews_template, itemData.reviewCount)
         binding.itemTextTitle.text = itemData.title
-        binding.itemMoveTime.text = itemView.context?.getString(R.string.time_template, itemData.runningTime)
+        binding.itemMoveTime.text = ""
     }
 }

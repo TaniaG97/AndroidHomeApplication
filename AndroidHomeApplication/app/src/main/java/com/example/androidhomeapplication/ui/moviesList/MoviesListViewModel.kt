@@ -1,14 +1,13 @@
-package com.example.androidhomeapplication.fragments.moviesList
+package com.example.androidhomeapplication.ui.moviesList
 
-import android.util.Log
 import androidx.lifecycle.*
-import com.android.academy.fundamentals.homework.data.MovieRepository
+import com.example.androidhomeapplication.data.repository.BaseRepository
 import com.example.androidhomeapplication.DataResult
-import com.example.androidhomeapplication.models.Movie
+import com.example.androidhomeapplication.data.models.Movie
 import kotlinx.coroutines.launch
 
 class MoviesListViewModel(
-    private val movieRepository: MovieRepository
+    private val movieRepository: BaseRepository
 ) : ViewModel() {
 
     private val mutableMovieList = MutableLiveData<DataResult<List<Movie>>>()
@@ -32,7 +31,7 @@ class MoviesListViewModel(
 }
 
 class MoviesListViewModelFactory(
-    private val movieRepository: MovieRepository
+    private val movieRepository: BaseRepository
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")

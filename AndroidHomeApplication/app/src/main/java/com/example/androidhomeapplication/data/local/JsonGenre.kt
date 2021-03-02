@@ -1,6 +1,6 @@
-package com.example.androidhomeapplication.data
+package com.example.androidhomeapplication.data.local
 
-import com.example.androidhomeapplication.models.Genre
+import com.example.androidhomeapplication.data.models.Genre
 import kotlinx.serialization.Serializable
 
 @Serializable

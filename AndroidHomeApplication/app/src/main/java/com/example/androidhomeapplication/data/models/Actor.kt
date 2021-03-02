@@ -1,4 +1,4 @@
-package com.example.androidhomeapplication.models
+package com.example.androidhomeapplication.data.models
 
 data class Actor(
     val id: Long,

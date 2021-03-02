@@ -1,19 +1,19 @@
-package com.example.androidhomeapplication.fragments.movieDetails
+package com.example.androidhomeapplication.ui.movieDetails
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.android.academy.fundamentals.homework.data.MovieRepository
+import com.example.androidhomeapplication.data.repository.BaseRepository
 import com.example.androidhomeapplication.DataResult
-import com.example.androidhomeapplication.models.Movie
+import com.example.androidhomeapplication.data.models.MovieDetails
 import kotlinx.coroutines.launch
 
 class MovieDetailsViewModel(
-    private val movieRepository: MovieRepository,
-    private val movieId: Long
+    private val movieRepository: BaseRepository,
+    private val movieId: Int
 ) : ViewModel() {
 
-    private val mutableMovie = MutableLiveData<DataResult<Movie>>()
-    val movie: LiveData<DataResult<Movie>> get() = mutableMovie
+    private val mutableMovie = MutableLiveData<DataResult<MovieDetails>>()
+    val movie: LiveData<DataResult<MovieDetails>> get() = mutableMovie
 
     init {
         getMovieDetails()
@@ -40,8 +40,8 @@ class MovieDetailsViewModel(
 }
 
 class MovieDetailsViewModelFactory(
-    private val movieRepository: MovieRepository,
-    private val movieId: Long
+    private val movieRepository: BaseRepository,
+    private val movieId: Int
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")

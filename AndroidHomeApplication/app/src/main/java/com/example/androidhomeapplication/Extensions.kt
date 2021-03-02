@@ -8,8 +8,8 @@ import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.android.academy.fundamentals.homework.data.MovieRepository
-import com.android.academy.fundamentals.homework.data.MovieRepositoryProvider
+import com.example.androidhomeapplication.data.repository.BaseRepository
+import com.example.androidhomeapplication.data.repository.RepositoryProvider
 import com.bumptech.glide.Glide
 import com.example.androidhomeapplication.databinding.ViewStarsBinding
 
@@ -32,7 +32,7 @@ fun ImageView.setImageActiveState(
     )
 }
 
-fun ImageView.loadImageWithGlide(imageUrl: String) {
+fun ImageView.loadImageWithGlide(imageUrl: String?) {
     Glide.with(this.context)
         .load(imageUrl)
         .placeholder(R.drawable.background_rect_with_border)
@@ -56,7 +56,7 @@ fun Context.readAssetFileToString(fileName: String): String {
     return stream.bufferedReader().readText()
 }
 
-val Fragment.movieRepository: MovieRepository get() = (activity?.application as MovieRepositoryProvider).movieRepository
+val Fragment.movieRepository: BaseRepository get() = (activity?.application as RepositoryProvider).movieRepository
 
 fun Fragment.showShortToast(msg: String) =
     Toast.makeText(
