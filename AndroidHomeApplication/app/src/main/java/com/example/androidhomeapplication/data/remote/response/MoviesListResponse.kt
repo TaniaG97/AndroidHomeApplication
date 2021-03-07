@@ -3,7 +3,7 @@ package com.example.androidhomeapplication.data.remote.response
 import kotlinx.serialization.*
 
 @Serializable
-data class PopularMoviesResponse(
+data class MoviesListResponse(
     @SerialName("page")
     val page: Long,
 

@@ -2,13 +2,13 @@ package com.example.androidhomeapplication.ui.movieDetails
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.androidhomeapplication.data.repository.BaseRepository
 import com.example.androidhomeapplication.DataResult
 import com.example.androidhomeapplication.data.models.MovieDetails
+import com.example.androidhomeapplication.data.repository.MoviesRepository
 import kotlinx.coroutines.launch
 
 class MovieDetailsViewModel(
-    private val movieRepository: BaseRepository,
+    private val movieRepository: MoviesRepository,
     private val movieId: Int
 ) : ViewModel() {
 
@@ -40,7 +40,7 @@ class MovieDetailsViewModel(
 }
 
 class MovieDetailsViewModelFactory(
-    private val movieRepository: BaseRepository,
+    private val movieRepository: MoviesRepository,
     private val movieId: Int
 ) : ViewModelProvider.Factory {
 

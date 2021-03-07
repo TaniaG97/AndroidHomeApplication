@@ -3,7 +3,6 @@ package com.example.androidhomeapplication
 import android.app.Application
 import com.example.androidhomeapplication.data.remote.ApiClient
 import com.example.androidhomeapplication.data.remote.RetrofitBuilder
-import com.example.androidhomeapplication.data.repository.BaseRepository
 import com.example.androidhomeapplication.data.repository.RepositoryProvider
 import com.example.androidhomeapplication.data.repository.MoviesRepository
 import com.example.androidhomeapplication.navigation.NavigatorHolderProvider
@@ -19,5 +18,5 @@ class App : Application(), RouterProvider, NavigatorHolderProvider, RepositoryPr
     override val navigatorHolder: NavigatorHolder get() = cicerone.getNavigatorHolder()
 
     private val apiClient = ApiClient(RetrofitBuilder.getRetrofit())
-    override val movieRepository: BaseRepository by lazy { MoviesRepository(apiClient) }
+    override val movieRepository: MoviesRepository by lazy { MoviesRepository(apiClient) }
 }

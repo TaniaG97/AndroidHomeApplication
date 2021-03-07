@@ -11,4 +11,5 @@
     <string name="empty_movies_list">Movies list is empty</string>
     <string name="something_wrong">Something was wrong.</string>
     <string name="empty_movie_details">Movies Details is empty</string>
+    <string name="search">Search...</string>
 </resources>

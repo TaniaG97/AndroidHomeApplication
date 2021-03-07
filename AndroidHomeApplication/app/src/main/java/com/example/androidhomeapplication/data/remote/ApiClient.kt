@@ -7,6 +7,7 @@ import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.models.MovieDetails
 import com.example.androidhomeapplication.data.remote.services.GenresService
 import com.example.androidhomeapplication.data.remote.services.MoviesService
+import com.example.androidhomeapplication.data.remote.services.SearchService
 import kotlinx.coroutines.*
 import retrofit2.Retrofit
 
@@ -24,6 +25,10 @@ class ApiClient(
     }
     private val genresService: GenresService by lazy {
         retrofit.create(GenresService::class.java)
+    }
+
+    private val searchService: SearchService by lazy {
+        retrofit.create(SearchService::class.java)
     }
 
     suspend fun loadMovies(): List<Movie> {
@@ -76,5 +81,33 @@ class ApiClient(
                 )
             }
         )
+    }
+
+    suspend fun searchMovies(string:String): List<Movie> {
+        val genres = genresService.loadGenres().genres
+        val movies = searchService.loadPopular(string, page = 1).results
+
+        return movies.map { movie ->
+            Movie(
+                id = movie.id,
+                title = movie.title,
+                imageUrl = BASE_POSTER_URL + movie.posterPath,
+                rating = movie.voteAverage.toInt(),
+                reviewCount = movie.voteCount,
+                pgAge = if (movie.adult) 16 else 13,
+                isLiked = false,
+                genres = genres
+                    .filter { genreResponse ->
+                        movie.genreIDS.contains(genreResponse.id)
+                    }
+                    .map { genre ->
+                        Genre(
+                            genre.id,
+                            genre.name
+                        )
+                    },
+
+                )
+        }
     }
 }

@@ -1,6 +1,8 @@
 package com.example.androidhomeapplication.ui.moviesList
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -20,7 +22,11 @@ import com.github.terrakok.cicerone.androidx.FragmentScreen
 
 class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
     private val binding by viewBinding(FragmentMoviesListBinding::bind)
-    private val viewModel: MoviesListViewModel by viewModels {MoviesListViewModelFactory(movieRepository)}
+    private val viewModel: MoviesListViewModel by viewModels {
+        MoviesListViewModelFactory(
+            movieRepository
+        )
+    }
 
     private val adapter: MoviesListAdapter = MoviesListAdapter(
         onItemClick = { item ->
@@ -30,10 +36,32 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initListeners()
+
         binding.cinemaRv.layoutManager = GridLayoutManager(context, 2)
         binding.cinemaRv.adapter = adapter
 
         viewModel.moviesList.observe(viewLifecycleOwner, ::setResult)
+    }
+
+    private fun initListeners(){
+        binding.searchView.searchViewIcon.setOnClickListener {
+            viewModel.searchMovies(binding.searchView.searchViewEditText.text.toString())
+        }
+
+        binding.searchView.searchViewEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s?.length == 0) {
+                    viewModel.getMoviesList()
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+        })
     }
 
     private fun setResult(result: DataResult<List<Movie>>) =

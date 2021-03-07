@@ -9,7 +9,7 @@ data class MovieResponse(
     val adult: Boolean,
 
     @SerialName("backdrop_path")
-    val backdropPath: String,
+    val backdropPath: String?,
 
     @SerialName("genre_ids")
     val genreIDS: List<Long>,
@@ -30,7 +30,7 @@ data class MovieResponse(
     val popularity: Double,
 
     @SerialName("poster_path")
-    val posterPath: String,
+    val posterPath: String?,
 
     @SerialName("release_date")
     val releaseDate: String,
