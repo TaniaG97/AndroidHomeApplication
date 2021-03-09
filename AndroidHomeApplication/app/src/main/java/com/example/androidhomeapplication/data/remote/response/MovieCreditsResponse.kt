@@ -1,5 +1,6 @@
 package com.example.androidhomeapplication.data.remote.response
 
+import com.example.androidhomeapplication.data.models.Actor
 import kotlinx.serialization.*
 
 @Serializable
@@ -52,3 +53,10 @@ data class CastResponse (
     @SerialName("order")
     val order: Long? = null,
 )
+
+fun CastResponse.mapToActor(profileURL: String): Actor =
+    Actor(
+        id = this.id,
+        name = this.name,
+        imageUrl = profileURL + this.profilePath
+    )

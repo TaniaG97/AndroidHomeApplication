@@ -1,10 +1,12 @@
 package com.example.androidhomeapplication.data.remote.response
 
+import com.example.androidhomeapplication.data.models.Actor
+import com.example.androidhomeapplication.data.models.Genre
+import com.example.androidhomeapplication.data.models.MovieDetails
 import kotlinx.serialization.*
-import kotlinx.serialization.json.JsonObject
 
 @Serializable
-data class MovieDetailsResponse (
+data class MovieDetailsResponse(
     @SerialName("adult")
     val adult: Boolean,
 
@@ -65,3 +67,17 @@ data class MovieDetailsResponse (
     @SerialName("vote_count")
     val voteCount: Long
 )
+
+fun MovieDetailsResponse.mapToMovieDetails(backdropURL: String, casts: List<Actor> = listOf()): MovieDetails =
+    MovieDetails(
+        id = this.id,
+        pgAge = if (this.adult) 16 else 13,
+        title = this.title,
+        genres = this.genres.map { genreResponse -> genreResponse.mapToGenre() },
+        reviewCount = this.voteCount,
+        isLiked = false,
+        rating = this.voteAverage.toInt(),
+        detailImageUrl = backdropURL + this.backdropPath,
+        storyLine = this.overview,
+        actors = casts
+    )

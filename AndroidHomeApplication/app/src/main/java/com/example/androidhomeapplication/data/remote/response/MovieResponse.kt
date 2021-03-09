@@ -1,5 +1,7 @@
 package com.example.androidhomeapplication.data.remote.response
 
+import com.example.androidhomeapplication.data.models.Genre
+import com.example.androidhomeapplication.data.models.Movie
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -47,3 +49,16 @@ data class MovieResponse(
     @SerialName("vote_count")
     val voteCount: Long
 )
+
+fun MovieResponse.mapToMovie(posterURL: String, genres: List<Genre> = listOf()): Movie =
+    Movie(
+        id = this.id,
+        title = this.title,
+        imageUrl = posterURL + this.posterPath,
+        rating = this.voteAverage.toInt(),
+        reviewCount = this.voteCount,
+        pgAge = if (this.adult) 16 else 13,
+        isLiked = false,
+        genres = genres,
+        )
+

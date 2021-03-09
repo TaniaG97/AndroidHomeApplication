@@ -5,6 +5,8 @@ import com.example.androidhomeapplication.data.models.Actor
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.models.MovieDetails
+import com.example.androidhomeapplication.data.remote.response.*
+import com.example.androidhomeapplication.data.remote.services.ConfigurationService
 import com.example.androidhomeapplication.data.remote.services.GenresService
 import com.example.androidhomeapplication.data.remote.services.MoviesService
 import com.example.androidhomeapplication.data.remote.services.SearchService
@@ -20,94 +22,70 @@ class ApiClient(
     private val retrofit: Retrofit
 ) {
 
+    private val configurationService: ConfigurationService by lazy {
+        retrofit.create(ConfigurationService::class.java)
+    }
     private val movieService: MoviesService by lazy {
         retrofit.create(MoviesService::class.java)
     }
     private val genresService: GenresService by lazy {
         retrofit.create(GenresService::class.java)
     }
-
     private val searchService: SearchService by lazy {
         retrofit.create(SearchService::class.java)
     }
 
-    suspend fun loadMovies(page:Int): List<Movie> {
-        val genres = genresService.loadGenres().genres
+    private var config: ConfigurationResponse? = null
+    private var genres: GenresResponse? = null
+
+    suspend fun loadConfigurationSettings() {
+        config = configurationService.loadConfiguration()
+        genres = genresService.loadGenres()
+    }
+
+    suspend fun loadMovies(page: Int): List<Movie> {
         val movies = movieService.loadPopular(page = page).results
+        if (genres == null) {
+            loadConfigurationSettings()
+        }
 
         return movies.map { movie ->
-            Movie(
-                id = movie.id,
-                title = movie.title,
-                imageUrl = BASE_POSTER_URL + movie.posterPath,
-                rating = movie.voteAverage.toInt(),
-                reviewCount = movie.voteCount,
-                pgAge = if (movie.adult) 16 else 13,
-                isLiked = false,
-                genres = genres
-                    .filter { genreResponse ->
-                        movie.genreIDS.contains(genreResponse.id)
-                    }
-                    .map { genre ->
-                        Genre(
-                            genre.id,
-                            genre.name
-                        )
-                    },
-
-            )
+            val movieGenres = genres!!.genres
+                .filter { genreResponse ->
+                    movie.genreIDS.contains(genreResponse.id)
+                }
+                .map { genre ->
+                    genre.mapToGenre()
+                }
+            movie.mapToMovie(BASE_POSTER_URL, movieGenres)
         }
     }
 
     suspend fun loadMovie(movieId: Int): MovieDetails {
         val details = movieService.loadMovieDetails(movieId)
-        val credits = movieService.loadMovieCredits(movieId)
+        val casts = movieService.loadMovieCredits(movieId).cast.map { castResponse ->
+            castResponse.mapToActor(BASE_PROFILE_URL)
+        }
 
-        return MovieDetails(
-            id = details.id,
-            pgAge = if (details.adult) 16 else 13,
-            title = details.title,
-            genres = details.genres.map { Genre(it.id, it.name) },
-            reviewCount = details.voteCount,
-            isLiked = false,
-            rating = details.voteAverage.toInt(),
-            detailImageUrl = BASE_BACKDROP_URL + details.backdropPath,
-            storyLine = details.overview,
-            actors = credits.cast.map { actor ->
-                Actor(
-                    id = actor.id,
-                    name = actor.name,
-                    imageUrl = BASE_PROFILE_URL + actor.profilePath
-                )
-            }
-        )
+        return details.mapToMovieDetails(BASE_BACKDROP_URL, casts)
     }
 
     suspend fun searchMovies(queryString: String, page: Int): List<Movie> {
-        val genres = genresService.loadGenres().genres
-        val movies = searchService.loadPopular(queryString, page = page).results
+        val movies = searchService.loadPopular(query = queryString, page = page).results
+
+        if (genres == null) {
+            loadConfigurationSettings()
+        }
 
         return movies.map { movie ->
-            Movie(
-                id = movie.id,
-                title = movie.title,
-                imageUrl = BASE_POSTER_URL + movie.posterPath,
-                rating = movie.voteAverage.toInt(),
-                reviewCount = movie.voteCount,
-                pgAge = if (movie.adult) 16 else 13,
-                isLiked = false,
-                genres = genres
-                    .filter { genreResponse ->
-                        movie.genreIDS.contains(genreResponse.id)
-                    }
-                    .map { genre ->
-                        Genre(
-                            genre.id,
-                            genre.name
-                        )
-                    },
-
-                )
+            val movieGenres = genres!!.genres
+                .filter { genreResponse ->
+                    movie.genreIDS.contains(genreResponse.id)
+                }
+                .map { genre ->
+                    genre.mapToGenre()
+                }
+            movie.mapToMovie(BASE_POSTER_URL, movieGenres)
         }
     }
 }
