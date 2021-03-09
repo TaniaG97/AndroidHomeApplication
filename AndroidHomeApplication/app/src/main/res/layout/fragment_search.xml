@@ -24,48 +24,47 @@
         app:layout_constraintGuide_end="16dp" />
 
     <ImageView
-        android:id="@+id/aim_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/movie_list_header"
+        android:id="@+id/arrow_back_icon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/search_header"
         app:layout_constraintStart_toEndOf="@id/guideline_start"
-        app:layout_constraintTop_toTopOf="@+id/movie_list_header"
-        app:srcCompat="@drawable/ic_aim" />
+        app:layout_constraintTop_toTopOf="@+id/search_header"
+        app:srcCompat="@drawable/ic_arrow_back" />
 
     <TextView
-        android:id="@+id/movie_list_header"
+        android:id="@+id/search_header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
-        android:text="@string/movies_list"
+        android:text="@string/search_header"
         android:textColor="@color/white"
         android:textSize="14sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/search_icon"
-        app:layout_constraintStart_toEndOf="@+id/aim_icon"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_end"
+        app:layout_constraintStart_toEndOf="@+id/arrow_back_icon"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/search_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/movie_list_header"
-        app:layout_constraintStart_toEndOf="@id/movie_list_header"
+    <include
+        android:id="@+id/search_view"
+        layout="@layout/view_search"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toStartOf="@+id/guideline_end"
-        app:layout_constraintTop_toTopOf="@+id/movie_list_header"
-        app:srcCompat="@drawable/ic_baseline_search_24"
-        app:tint="@color/white_transparent" />
+        app:layout_constraintStart_toEndOf="@id/guideline_start"
+        app:layout_constraintTop_toBottomOf="@id/search_header"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/cinema_rv"
+        android:id="@+id/search_rv"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline_end"
         app:layout_constraintStart_toEndOf="@id/guideline_start"
-        app:layout_constraintTop_toBottomOf="@+id/movie_list_header"
+        app:layout_constraintTop_toBottomOf="@+id/search_view"
         tools:itemCount="4"
         tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         tools:listitem="@layout/item_movies_list"

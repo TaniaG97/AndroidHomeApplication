@@ -31,9 +31,9 @@ class ApiClient(
         retrofit.create(SearchService::class.java)
     }
 
-    suspend fun loadMovies(): List<Movie> {
+    suspend fun loadMovies(page:Int): List<Movie> {
         val genres = genresService.loadGenres().genres
-        val movies = movieService.loadPopular(page = 1).results
+        val movies = movieService.loadPopular(page = page).results
 
         return movies.map { movie ->
             Movie(
@@ -83,9 +83,9 @@ class ApiClient(
         )
     }
 
-    suspend fun searchMovies(string:String): List<Movie> {
+    suspend fun searchMovies(queryString: String, page: Int): List<Movie> {
         val genres = genresService.loadGenres().genres
-        val movies = searchService.loadPopular(string, page = 1).results
+        val movies = searchService.loadPopular(queryString, page = page).results
 
         return movies.map { movie ->
             Movie(

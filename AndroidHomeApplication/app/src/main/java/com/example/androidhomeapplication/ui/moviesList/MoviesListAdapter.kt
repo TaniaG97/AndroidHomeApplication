@@ -3,6 +3,7 @@ package com.example.androidhomeapplication.ui.moviesList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +17,7 @@ import com.example.androidhomeapplication.setRating
 
 class MoviesListAdapter(
     private val onItemClick: ((Movie) -> Unit)
-) : ListAdapter<Movie, MovieItemViewHolder>(TaskDiffCallBack()) {
+) : PagingDataAdapter<Movie, MovieItemViewHolder>(TaskDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieItemViewHolder {
         val view =
@@ -24,7 +25,12 @@ class MoviesListAdapter(
         return MovieItemViewHolder(view, onItemClick)
     }
 
-    override fun onBindViewHolder(holder: MovieItemViewHolder, position: Int) = holder.bind(getItem(position))
+    override fun onBindViewHolder(holder: MovieItemViewHolder, position: Int) {
+        val item: Movie? = getItem(position)
+        if (item!=null){
+            holder.bind(item)
+        }
+    }
 }
 
 private class TaskDiffCallBack : DiffUtil.ItemCallback<Movie>() {

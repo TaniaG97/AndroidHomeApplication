@@ -8,15 +8,15 @@ class MoviesRepository(
     private val apiClient: ApiClient
 ) {
 
-    suspend fun getMovies(): List<Movie> {
-        return apiClient.loadMovies()
+    suspend fun getMovies(page:Int): List<Movie> {
+        return apiClient.loadMovies(page)
     }
 
     suspend fun getMovie(movieId: Int): MovieDetails {
         return apiClient.loadMovie(movieId)
     }
 
-    suspend fun searchMovies(searchValue: String): List<Movie> {
-        return apiClient.searchMovies(searchValue)
+    suspend fun searchMovies(queryString: String, page: Int): List<Movie> {
+        return apiClient.searchMovies(queryString, page)
     }
 }
