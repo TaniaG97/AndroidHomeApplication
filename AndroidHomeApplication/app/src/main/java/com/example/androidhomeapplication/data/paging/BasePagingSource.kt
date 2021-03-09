@@ -25,9 +25,6 @@ abstract class BasePagingSource<Item : Any> : PagingSource<Int, Item>() {
         }
     }
 
-    /**
-     * load data
-     */
     abstract suspend fun loadData(
         params: LoadParams<Int>
     ): List<Item>?

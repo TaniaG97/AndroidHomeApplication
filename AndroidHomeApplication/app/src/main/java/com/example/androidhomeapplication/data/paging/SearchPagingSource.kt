@@ -9,6 +9,6 @@ class SearchPagingSource(
 ) : BasePagingSource<Movie>() {
 
     override suspend fun loadData(params: LoadParams<Int>): List<Movie> {
-        return moviesRepository.searchMovies(queryString,params.key ?: getFirstPage())
+        return moviesRepository.searchMovies(queryString, params.key ?: getFirstPage())
     }
 }
