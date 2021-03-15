@@ -12,7 +12,7 @@ class MoviesRepository(
         return apiClient.loadMovies(page)
     }
 
-    suspend fun getMovie(movieId: Int): MovieDetails {
+    suspend fun getMovie(movieId: Long): MovieDetails {
         return apiClient.loadMovie(movieId)
     }
 

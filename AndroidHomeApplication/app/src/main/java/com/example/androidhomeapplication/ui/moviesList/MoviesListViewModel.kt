@@ -18,9 +18,8 @@ class MoviesListViewModel(
     private val moviesRepository: MoviesRepository
 ) : ViewModel() {
 
-    private val pagingConfig: PagingConfig by lazy {
-        PagingConfig(pageSize = Constants.DEFAULT_ITEM_PER_PAGE)
-    }
+    private val pagingConfig: PagingConfig = PagingConfig(pageSize = Constants.DEFAULT_ITEM_PER_PAGE)
+
 
     val movieItems: Flow<PagingData<Movie>> by lazy {
         Pager(pagingConfig) {

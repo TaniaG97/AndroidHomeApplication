@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 class MovieDetailsViewModel(
     private val movieRepository: MoviesRepository,
-    private val movieId: Int
+    private val movieId: Long
 ) : ViewModel() {
 
     private val mutableMovie = MutableLiveData<DataResult<MovieDetails>>()
@@ -41,7 +41,7 @@ class MovieDetailsViewModel(
 
 class MovieDetailsViewModelFactory(
     private val movieRepository: MoviesRepository,
-    private val movieId: Int
+    private val movieId: Long
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")

@@ -52,12 +52,12 @@ data class MovieResponse(
 
 fun MovieResponse.mapToMovie(posterURL: String, genres: List<Genre> = listOf()): Movie =
     Movie(
-        id = this.id,
+        id = this.id.toLong(),
         title = this.title,
         imageUrl = posterURL + this.posterPath,
         rating = this.voteAverage.toInt(),
         reviewCount = this.voteCount,
-        pgAge = if (this.adult) 16 else 13,
+        ageLimit = if (this.adult) 16 else 13,
         isLiked = false,
         genres = genres,
         )

@@ -48,8 +48,8 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
         binding.cinemaRv.layoutManager = GridLayoutManager(context, 2)
         binding.cinemaRv.adapter = pagingAdapter
         lifecycleScope.launch {
-            viewModel.movieItems.collectLatest {
-                pagingAdapter.submitData(it)
+            viewModel.movieItems.collectLatest {data ->
+                pagingAdapter.submitData(data)
             }
         }
     }

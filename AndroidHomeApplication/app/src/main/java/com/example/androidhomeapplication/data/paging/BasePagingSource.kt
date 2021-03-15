@@ -6,28 +6,27 @@ import com.example.androidhomeapplication.data.constans.Constants.DEFAULT_FIRST_
 
 abstract class BasePagingSource<Item : Any> : PagingSource<Int, Item>() {
 
-    override fun getRefreshKey(state: PagingState<Int, Item>): Int? {
-        return state.anchorPosition
-    }
+    open val firstPage: Int = DEFAULT_FIRST_PAGE
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Item> {
-        return try {
-            val page = params.key ?: getFirstPage()
+    override fun getRefreshKey(state: PagingState<Int, Item>): Int? = state.anchorPosition
+
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Item> =
+        try {
+            val key = params.key ?: firstPage
             LoadResult.Page(
-                data = loadData(params = params) ?: listOf(),
-                prevKey = if (page == getFirstPage()) null else page - 1,
-                nextKey = page + 1
+                data = loadData(params.key).orEmpty(),
+                prevKey = if (key == firstPage) {
+                    null
+                } else {
+                    key - 1
+                },
+                nextKey = key + 1
             )
         } catch (e: Exception) {
             LoadResult.Error(e)
-        } finally {
-
         }
-    }
 
     abstract suspend fun loadData(
-        params: LoadParams<Int>
+        pageKey: Int?
     ): List<Item>?
-
-    open fun getFirstPage(): Int = DEFAULT_FIRST_PAGE
 }

@@ -35,22 +35,13 @@ class ApiClient(
         retrofit.create(SearchService::class.java)
     }
 
-    private var config: ConfigurationResponse? = null
-    private var genres: GenresResponse? = null
-
-    suspend fun loadConfigurationSettings() {
-        config = configurationService.loadConfiguration()
-        genres = genresService.loadGenres()
-    }
+    private var genres: List<GenreResponse> = listOf()
 
     suspend fun loadMovies(page: Int): List<Movie> {
         val movies = movieService.loadPopular(page = page).results
-        if (genres == null) {
-            loadConfigurationSettings()
-        }
 
         return movies.map { movie ->
-            val movieGenres = genres!!.genres
+            val movieGenres = getCachedGenresOrLoad()
                 .filter { genreResponse ->
                     movie.genreIDS.contains(genreResponse.id)
                 }
@@ -61,7 +52,7 @@ class ApiClient(
         }
     }
 
-    suspend fun loadMovie(movieId: Int): MovieDetails {
+    suspend fun loadMovie(movieId: Long): MovieDetails {
         val details = movieService.loadMovieDetails(movieId)
         val casts = movieService.loadMovieCredits(movieId).cast.map { castResponse ->
             castResponse.mapToActor(BASE_PROFILE_URL)
@@ -73,12 +64,8 @@ class ApiClient(
     suspend fun searchMovies(queryString: String, page: Int): List<Movie> {
         val movies = searchService.loadPopular(query = queryString, page = page).results
 
-        if (genres == null) {
-            loadConfigurationSettings()
-        }
-
         return movies.map { movie ->
-            val movieGenres = genres!!.genres
+            val movieGenres = getCachedGenresOrLoad()
                 .filter { genreResponse ->
                     movie.genreIDS.contains(genreResponse.id)
                 }
@@ -88,4 +75,18 @@ class ApiClient(
             movie.mapToMovie(BASE_POSTER_URL, movieGenres)
         }
     }
+
+    suspend fun getCachedGenresOrLoad(): List<GenreResponse> {
+        return if (genres.isEmpty()) {
+            loadGanres()
+        } else {
+            genres
+        }
+    }
+
+    private suspend fun loadGanres(): List<GenreResponse> {
+        genres = genresService.loadGenres().genres
+        return genres
+    }
+
 }

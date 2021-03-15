@@ -1,8 +1,8 @@
 package com.example.androidhomeapplication.data.models
 
 data class MovieDetails(
-    val id: Int,
-    val pgAge: Int,
+    val id: Long,
+    val ageLimit: Int,
     val title: String,
     val genres: List<Genre>,
     val reviewCount: Long,

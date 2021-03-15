@@ -1,7 +1,6 @@
 package com.example.androidhomeapplication.data.remote.response
 
 import com.example.androidhomeapplication.data.models.Actor
-import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.MovieDetails
 import kotlinx.serialization.*
 
@@ -70,8 +69,8 @@ data class MovieDetailsResponse(
 
 fun MovieDetailsResponse.mapToMovieDetails(backdropURL: String, casts: List<Actor> = listOf()): MovieDetails =
     MovieDetails(
-        id = this.id,
-        pgAge = if (this.adult) 16 else 13,
+        id = this.id.toLong(),
+        ageLimit = if (this.adult) 16 else 13,
         title = this.title,
         genres = this.genres.map { genreResponse -> genreResponse.mapToGenre() },
         reviewCount = this.voteCount,

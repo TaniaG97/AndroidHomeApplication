@@ -7,7 +7,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class GenresResponse(
+data class GenresResponse(
     @SerialName("genres")
     val genres: List<GenreResponse>
 )

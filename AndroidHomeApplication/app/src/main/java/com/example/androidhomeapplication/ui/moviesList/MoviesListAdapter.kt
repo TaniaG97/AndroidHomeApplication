@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.androidhomeapplication.R
@@ -57,7 +56,7 @@ class MovieItemViewHolder(
     fun bind(itemData: Movie) {
         this.itemData = itemData
         binding.itemImage.loadImageWithGlide(itemData.imageUrl)
-        binding.itemTextAge.text = itemView.context.getString(R.string.age_template, itemData.pgAge)
+        binding.itemTextAge.text = itemView.context.getString(R.string.age_template, itemData.ageLimit)
         binding.itemIconLike.setImageActiveState(isActive = itemData.isLiked)
         binding.itemMoveTypes.text = itemData.genres.joinToString(", ") { genre -> genre.name }
         binding.itemStars.setRating(itemData.rating)

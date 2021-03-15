@@ -11,7 +11,6 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.androidhomeapplication.*
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
 import com.example.androidhomeapplication.data.models.Actor
-import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.models.MovieDetails
 import com.example.androidhomeapplication.navigation.RouterProvider
 import com.github.terrakok.cicerone.androidx.FragmentScreen
@@ -24,7 +23,7 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val viewModel: MovieDetailsViewModel by viewModels {
         MovieDetailsViewModelFactory(
             movieRepository,
-            arguments?.getInt(KEY_MOVIE_ID)!!
+            arguments?.getLong(KEY_MOVIE_ID)!!
         )
     }
 
@@ -63,7 +62,7 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
 
     private fun setMovieFields(movieData: MovieDetails) {
         binding.backgroundImage.loadImageWithGlide(movieData.detailImageUrl)
-        binding.textAge.text = context?.getString(R.string.age_template, movieData.pgAge)
+        binding.textAge.text = context?.getString(R.string.age_template, movieData.ageLimit)
         binding.textTitle.text = movieData.title
         binding.textMoveTypes.text = movieData.genres.joinToString(", ") { genre -> genre.name }
         binding.stars.setRating(movieData.rating)
@@ -77,12 +76,12 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     }
 }
 
-class MovieDetailsScreen(private val movieId: Int) : FragmentScreen(
+class MovieDetailsScreen(private val movieId: Long) : FragmentScreen(
     key = "MovieDetailsScreen",
     fragmentCreator = { fragmentFactory: FragmentFactory ->
         val fragment = FragmentMovieDetails()
         val args = Bundle(1)
-        args.putInt(KEY_MOVIE_ID, movieId)
+        args.putLong(KEY_MOVIE_ID, movieId)
         fragment.arguments = args
         fragment
     }
