@@ -1,6 +1,8 @@
 package com.example.androidhomeapplication.data.remote.response
 
+import com.example.androidhomeapplication.Utils
 import com.example.androidhomeapplication.data.models.Actor
+import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.models.MovieDetails
 import kotlinx.serialization.*
 
@@ -69,14 +71,16 @@ data class MovieDetailsResponse(
 
 fun MovieDetailsResponse.mapToMovieDetails(backdropURL: String, casts: List<Actor> = listOf()): MovieDetails =
     MovieDetails(
-        id = this.id.toLong(),
-        ageLimit = if (this.adult) 16 else 13,
-        title = this.title,
-        genres = this.genres.map { genreResponse -> genreResponse.mapToGenre() },
-        reviewCount = this.voteCount,
-        isLiked = false,
-        rating = this.voteAverage.toInt(),
-        detailImageUrl = backdropURL + this.backdropPath,
+        movieBaseInfo = Movie(
+            id = this.id.toLong(),
+            ageLimit = Utils.getAgeLimit(this.adult),
+            title = this.title,
+            genres = this.genres.map { genreResponse -> genreResponse.mapToGenre() },
+            reviewCount = this.voteCount,
+            isLiked = false,
+            rating = this.voteAverage.toInt(),
+            imageUrl = backdropURL + this.backdropPath
+        ),
         storyLine = this.overview,
         actors = casts
     )

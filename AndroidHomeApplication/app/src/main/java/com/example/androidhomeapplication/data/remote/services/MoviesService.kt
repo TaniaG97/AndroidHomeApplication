@@ -1,5 +1,6 @@
 package com.example.androidhomeapplication.data.remote.services
 
+import com.example.androidhomeapplication.data.remote.response.GenresResponse
 import com.example.androidhomeapplication.data.remote.response.MovieCreditsResponse
 import com.example.androidhomeapplication.data.remote.response.MovieDetailsResponse
 import com.example.androidhomeapplication.data.remote.response.MoviesListResponse
@@ -22,4 +23,14 @@ interface MoviesService {
     suspend fun loadMovieCredits(
         @Path("movie_id") movieId: Long
     ): MovieCreditsResponse
+
+    @GET("genre/movie/list")
+    suspend fun loadGenres(): GenresResponse
+
+    @GET("search/movie")
+    suspend fun searchMovie(
+        @Query("query") query: String,
+        @Query("page") page: Int
+    ): MoviesListResponse
+
 }

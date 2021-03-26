@@ -1,5 +1,6 @@
 package com.example.androidhomeapplication.data.remote.response
 
+import com.example.androidhomeapplication.Utils
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
 import kotlinx.serialization.SerialName
@@ -57,7 +58,7 @@ fun MovieResponse.mapToMovie(posterURL: String, genres: List<Genre> = listOf()):
         imageUrl = posterURL + this.posterPath,
         rating = this.voteAverage.toInt(),
         reviewCount = this.voteCount,
-        ageLimit = if (this.adult) 16 else 13,
+        ageLimit = Utils.getAgeLimit(this.adult),
         isLiked = false,
         genres = genres,
         )

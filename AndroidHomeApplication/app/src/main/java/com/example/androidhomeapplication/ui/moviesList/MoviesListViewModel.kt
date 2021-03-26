@@ -10,6 +10,7 @@ import com.example.androidhomeapplication.data.constans.Constants
 import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.paging.BasePagingSource
 import com.example.androidhomeapplication.data.paging.MoviePagingSource
+import com.example.androidhomeapplication.data.paging.SearchPagingSource
 import com.example.androidhomeapplication.data.repository.MoviesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -19,12 +20,23 @@ class MoviesListViewModel(
 ) : ViewModel() {
 
     private val pagingConfig: PagingConfig = PagingConfig(pageSize = Constants.DEFAULT_ITEM_PER_PAGE)
+    var currentQueryValue: String? = null
+    var moviesList: Flow<PagingData<Movie>>? = null
 
-
-    val movieItems: Flow<PagingData<Movie>> by lazy {
-        Pager(pagingConfig) {
+    fun getMovies(){
+        currentQueryValue=null
+        moviesList =  Pager(pagingConfig) {
             MoviePagingSource(moviesRepository)
         }.flow.cachedIn(viewModelScope)
+    }
+
+    fun searchMovies(queryString: String) {
+        if (queryString != currentQueryValue ){
+            currentQueryValue = queryString
+            moviesList = Pager(pagingConfig) {
+                SearchPagingSource(moviesRepository, queryString)
+            }.flow.cachedIn(viewModelScope)
+        }
     }
 }
 

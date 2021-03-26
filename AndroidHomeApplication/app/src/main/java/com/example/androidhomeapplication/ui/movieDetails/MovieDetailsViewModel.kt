@@ -24,7 +24,7 @@ class MovieDetailsViewModel(
 
         viewModelScope.launch {
             mutableMovie.value = try {
-                val result = movieRepository.getMovie(movieId)
+                val result = movieRepository.loadMovie(movieId)
                 if (result != null) {
                     DataResult.Success(result)
                 } else {

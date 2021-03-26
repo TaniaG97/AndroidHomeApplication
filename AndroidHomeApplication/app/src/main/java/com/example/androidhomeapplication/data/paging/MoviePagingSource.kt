@@ -7,6 +7,6 @@ class MoviePagingSource(
     private val moviesRepository: MoviesRepository
 ) : BasePagingSource<Movie>() {
 
-    override suspend fun loadData(pageKey: Int?): List<Movie> =
-        moviesRepository.getMovies(pageKey ?: firstPage)
+    override suspend fun loadData(pageKey: Int): List<Movie> =
+        moviesRepository.loadMovies(pageKey)
 }

@@ -31,7 +31,6 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
         super.onViewCreated(view, savedInstanceState)
 
         initViews()
-
         viewModel.movie.observe(viewLifecycleOwner, ::setResult)
     }
 
@@ -61,12 +60,12 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
         }
 
     private fun setMovieFields(movieData: MovieDetails) {
-        binding.backgroundImage.loadImageWithGlide(movieData.detailImageUrl)
-        binding.textAge.text = context?.getString(R.string.age_template, movieData.ageLimit)
-        binding.textTitle.text = movieData.title
-        binding.textMoveTypes.text = movieData.genres.joinToString(", ") { genre -> genre.name }
-        binding.stars.setRating(movieData.rating)
-        binding.textReviews.text = getString(R.string.reviews_template, movieData.reviewCount)
+        binding.backgroundImage.loadImageWithGlide(movieData.movieBaseInfo.imageUrl)
+        binding.textAge.text = context?.getString(R.string.age_template, movieData.movieBaseInfo.ageLimit)
+        binding.textTitle.text = movieData.movieBaseInfo.title
+        binding.textMoveTypes.text = movieData.movieBaseInfo.genres.joinToString(", ") { genre -> genre.name }
+        binding.stars.setRating(movieData.movieBaseInfo.rating)
+        binding.textReviews.text = getString(R.string.reviews_template, movieData.movieBaseInfo.reviewCount)
         binding.textStorylineDescription.text = movieData.storyLine
         updateAdapter(movieData.actors)
     }

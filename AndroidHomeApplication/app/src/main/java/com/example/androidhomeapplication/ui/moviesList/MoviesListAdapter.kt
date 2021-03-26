@@ -63,6 +63,6 @@ class MovieItemViewHolder(
         binding.itemTextReviews.text =
             itemView.context?.getString(R.string.reviews_template, itemData.reviewCount)
         binding.itemTextTitle.text = itemData.title
-        binding.itemMoveTime.text = ""
+        binding.itemMoveTime.text = "" //todo change to show movie release date
     }
 }

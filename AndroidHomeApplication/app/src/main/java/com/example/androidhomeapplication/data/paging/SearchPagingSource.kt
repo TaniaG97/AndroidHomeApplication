@@ -8,6 +8,6 @@ class SearchPagingSource(
     private val queryString: String
 ) : BasePagingSource<Movie>() {
 
-    override suspend fun loadData(pageKey: Int?): List<Movie> =
-        moviesRepository.searchMovies(queryString, pageKey ?: firstPage)
+    override suspend fun loadData(pageKey: Int): List<Movie> =
+        moviesRepository.searchMovies(queryString, pageKey)
 }
