@@ -15,7 +15,7 @@ data class MovieResponse(
     val backdropPath: String?,
 
     @SerialName("genre_ids")
-    val genreIDS: List<Long>,
+    val genreIds: List<Long>,
 
     @SerialName("id")
     val id: Int,
@@ -51,15 +51,14 @@ data class MovieResponse(
     val voteCount: Long
 )
 
-fun MovieResponse.mapToMovie(posterURL: String, genres: List<Genre> = listOf()): Movie =
+fun MovieResponse.mapToMovie(posterUrl: String, genres: List<Genre>): Movie =
     Movie(
         id = this.id.toLong(),
         title = this.title,
-        imageUrl = posterURL + this.posterPath,
+        imageUrl = posterUrl + this.posterPath,
         rating = this.voteAverage.toInt(),
         reviewCount = this.voteCount,
         ageLimit = Utils.getAgeLimit(this.adult),
         isLiked = false,
         genres = genres,
         )
-

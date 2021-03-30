@@ -69,7 +69,7 @@ data class MovieDetailsResponse(
     val voteCount: Long
 )
 
-fun MovieDetailsResponse.mapToMovieDetails(backdropURL: String, casts: List<Actor> = listOf()): MovieDetails =
+fun MovieDetailsResponse.mapToMovieDetails(backdropUrl: String, casts: List<Actor>): MovieDetails =
     MovieDetails(
         movieBaseInfo = Movie(
             id = this.id.toLong(),
@@ -79,7 +79,7 @@ fun MovieDetailsResponse.mapToMovieDetails(backdropURL: String, casts: List<Acto
             reviewCount = this.voteCount,
             isLiked = false,
             rating = this.voteAverage.toInt(),
-            imageUrl = backdropURL + this.backdropPath
+            imageUrl = backdropUrl + this.backdropPath
         ),
         storyLine = this.overview,
         actors = casts

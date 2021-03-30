@@ -16,5 +16,3 @@ data class MoviesListResponse(
     @SerialName("total_pages")
     val totalPages: Long
 )
-
-

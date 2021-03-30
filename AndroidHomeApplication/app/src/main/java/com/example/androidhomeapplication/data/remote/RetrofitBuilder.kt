@@ -11,21 +11,20 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 
 private const val BASE_URL = "https://api.themoviedb.org/3/"
-private const val API_KEY = "89f113560486f0b91694ad4221fe6dca"
 
 object RetrofitBuilder {
 
     fun buildRetrofit(): Retrofit {
         val httpLoggingInterceptor = HttpLoggingInterceptor()
-        if (BuildConfig.DEBUG) {
-            httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+        httpLoggingInterceptor.level = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BODY
         } else {
-            httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.NONE
+            HttpLoggingInterceptor.Level.NONE
         }
 
         val okHttpClient = OkHttpClient.Builder()
             .addNetworkInterceptor(httpLoggingInterceptor)
-            .addInterceptor(CustomInterceptor())
+            .addInterceptor(ApiKeyInterceptor())
             .build()
 
         val json = Json {
@@ -41,22 +40,5 @@ object RetrofitBuilder {
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
         return retrofit
-    }
-}
-
-class CustomInterceptor : Interceptor{
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val origin = chain.request()
-        val urlBuilder = origin.url.newBuilder()
-        val url = urlBuilder
-            .addQueryParameter("api_key", API_KEY)
-            .build()
-
-        val requestBuilder = origin.newBuilder()
-            .url(url)
-
-        val request = requestBuilder.build()
-
-        return chain.proceed(request)
     }
 }

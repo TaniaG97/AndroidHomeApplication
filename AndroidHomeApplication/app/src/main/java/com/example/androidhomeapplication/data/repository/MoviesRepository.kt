@@ -3,71 +3,74 @@ package com.example.androidhomeapplication.data.repository
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.models.MovieDetails
-import com.example.androidhomeapplication.data.remote.*
+import com.example.androidhomeapplication.data.remote.RetrofitBuilder
 import com.example.androidhomeapplication.data.remote.response.*
 import com.example.androidhomeapplication.data.remote.services.ConfigurationService
 import com.example.androidhomeapplication.data.remote.services.MoviesService
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import retrofit2.Retrofit
 
-private const val SECURE_BASE_URL = "https://image.tmdb.org/t/p/"
-private const val BASE_POSTER_SIZE = "w500"
-private const val BASE_BACKDROP_SIZE = "w780"
-private const val BASE_PROFILE_SIZE = "w185"
+private const val SECURE_BASE_URL: String = "https://image.tmdb.org/t/p/"
 
-enum class ImageType {
-    POSTER,
-    BACKDROP,
-    PROFILE
+enum class ImageType(val size: String) {
+    POSTER(size = "w500"),
+    BACKDROP(size = "w780"),
+    PROFILE(size = "w185")
 }
 
-class MoviesRepository(
-    private val retrofit: Retrofit,
-    private val configurationService: ConfigurationService,
-    private val movieService: MoviesService
-) {
+class MoviesRepository() {
+    private val retrofit: Retrofit = RetrofitBuilder.buildRetrofit()
+    private val configurationService: ConfigurationService by lazy {  retrofit.create(ConfigurationService::class.java) }
+    private val movieService: MoviesService by lazy { retrofit.create(MoviesService::class.java) }
+
     private val mutex = Mutex()
-    private var genres: Map<Long, Genre> = mapOf()
+    private var genres: Map<Long, Genre>? = null
     private var configInfo: ConfigurationResponse? = null
 
-    suspend fun loadMovies(page: Int): List<Movie> {
-        val movies = movieService.loadPopular(page = page).results
-        val genersMap = getCachedGenresOrLoad()
-        return movies.map { movie ->
-            val movieGenres = mutableListOf<Genre>()
-            movie.genreIDS.forEach { genreId -> movieGenres.add(genersMap.getValue(genreId)) }
-            movie.mapToMovie(getImageUrlByType(ImageType.POSTER), movieGenres)
+    suspend fun loadMovies(page: Int): List<Movie> = coroutineScope {
+        val movies = async { movieService.loadPopular(page = page).results }
+        val genresMap = async { getCachedGenresOrLoad() }
+        val posterImageUrl = getImageUrlByType(ImageType.POSTER)
+
+        movies.await().map { movie ->
+            val movieGenres = movie.genreIds.mapNotNull { singleGenreId -> genresMap.await()[singleGenreId] }
+            movie.mapToMovie(posterImageUrl, movieGenres)
         }
     }
 
-    suspend fun loadMovie(movieId: Long): MovieDetails {
-        val details = movieService.loadMovieDetails(movieId)
-        val casts = movieService.loadMovieCredits(movieId).cast.map { castResponse ->
-            castResponse.mapToActor(getImageUrlByType(ImageType.PROFILE))
+    suspend fun loadMovie(movieId: Long): MovieDetails = coroutineScope {
+        val profileImageUrl = getImageUrlByType(ImageType.PROFILE)
+        val backdropImageUrl = getImageUrlByType(ImageType.BACKDROP)
+
+        val details = async { movieService.loadMovieDetails(movieId) }
+        val casts = async { movieService.loadMovieCredits(movieId).cast.map { castResponse ->
+            castResponse.mapToActor(profileImageUrl) }
         }
 
-        return details.mapToMovieDetails(getImageUrlByType(ImageType.BACKDROP), casts)
+        details.await().mapToMovieDetails(backdropImageUrl, casts.await())
     }
 
-    suspend fun searchMovies(queryString: String, page: Int): List<Movie> {
-        val movies = movieService.searchMovie(query = queryString, page = page).results
-        val genersMap = getCachedGenresOrLoad()
-        return movies.map { movie ->
-            val movieGenres = mutableListOf<Genre>()
-            movie.genreIDS.forEach { genreId -> movieGenres.add(genersMap.getValue(genreId)) }
-            movie.mapToMovie(getImageUrlByType(ImageType.POSTER), movieGenres)
+    suspend fun searchMovies(queryString: String, page: Int): List<Movie> = coroutineScope {
+        val movies = async { movieService.searchMovie(query = queryString, page = page).results }
+        val genresMap = async { getCachedGenresOrLoad() }
+        val posterImageUrl = getImageUrlByType(ImageType.POSTER)
+
+        movies.await().map { movie ->
+            val movieGenres = movie.genreIds.mapNotNull { singleGenreId -> genresMap.await()[singleGenreId] }
+            movie.mapToMovie(posterImageUrl, movieGenres)
         }
     }
 
     suspend fun getCachedGenresOrLoad(): Map<Long, Genre> {
         mutex.withLock {
-            if (genres.isEmpty()) {
-                genres =
-                    movieService.loadGenres().genres.associateBy({ it.id }, { it.mapToGenre() })
+            if (genres == null) {
+                genres = movieService.loadGenres().genres.associateBy({genres -> genres.id }, {genreResponse ->  genreResponse.mapToGenre() })
             }
         }
-        return genres
+        return genres ?: mapOf()
     }
 
     suspend fun getCachedConfigInfoOrLoad(): ConfigurationResponse? {
@@ -82,11 +85,14 @@ class MoviesRepository(
     suspend fun getImageUrlByType(imageType: ImageType): String {
         val configuration = getCachedConfigInfoOrLoad()
 
-        val secureBaseURL = configuration?.images?.secureBaseURL ?: SECURE_BASE_URL
+        val secureBaseURL = configuration?.images?.secureBaseUrl ?: SECURE_BASE_URL
         val imageSize = when (imageType) {
-            ImageType.POSTER -> configuration?.images?.posterSizes?.last() ?: "$BASE_POSTER_SIZE/"
-            ImageType.BACKDROP -> configuration?.images?.backdropSizes?.last() ?: "$BASE_BACKDROP_SIZE/"
-            ImageType.PROFILE -> configuration?.images?.profileSizes?.last() ?: "$BASE_PROFILE_SIZE/"
+            ImageType.POSTER -> configuration?.images?.posterSizes?.last()
+                ?: "${ImageType.POSTER.size}/"
+            ImageType.BACKDROP -> configuration?.images?.backdropSizes?.last()
+                ?: "${ImageType.BACKDROP.size}/"
+            ImageType.PROFILE -> configuration?.images?.profileSizes?.last()
+                ?: "${ImageType.PROFILE.size}/"
         }
 
         return secureBaseURL + imageSize

@@ -14,10 +14,10 @@ data class ConfigurationResponse(
 @Serializable
 data class Images(
     @SerialName("base_url")
-    val baseURL: String,
+    val baseUrl: String,
 
     @SerialName("secure_base_url")
-    val secureBaseURL: String,
+    val secureBaseUrl: String,
 
     @SerialName("backdrop_sizes")
     val backdropSizes: List<String>,

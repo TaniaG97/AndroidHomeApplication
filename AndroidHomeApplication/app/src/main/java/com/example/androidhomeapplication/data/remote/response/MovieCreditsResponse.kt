@@ -42,21 +42,21 @@ data class CastResponse (
     val profilePath: String? = null,
 
     @SerialName("cast_id")
-    val castID: Long? = null,
+    val castId: Long? = null,
 
     @SerialName("character")
     val character: String? = null,
 
     @SerialName("credit_id")
-    val creditID: String,
+    val creditId: String,
 
     @SerialName("order")
     val order: Long? = null,
 )
 
-fun CastResponse.mapToActor(profileURL: String): Actor =
+fun CastResponse.mapToActor(profileUrl: String): Actor =
     Actor(
         id = this.id,
         name = this.name,
-        imageUrl = profileURL + this.profilePath
+        imageUrl = profileUrl + this.profilePath
     )

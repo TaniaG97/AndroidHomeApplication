@@ -25,11 +25,7 @@ class MovieDetailsViewModel(
         viewModelScope.launch {
             mutableMovie.value = try {
                 val result = movieRepository.loadMovie(movieId)
-                if (result != null) {
-                    DataResult.Success(result)
-                } else {
-                    DataResult.EmptyResult()
-                }
+                DataResult.Success(result)
 
             } catch (throwable: Throwable) {
                 Log.e("MovieDetailsViewModel", "getMovieDetails: Failed", throwable)
