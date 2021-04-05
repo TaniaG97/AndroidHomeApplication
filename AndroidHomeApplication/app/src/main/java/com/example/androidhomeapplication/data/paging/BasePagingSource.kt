@@ -8,7 +8,7 @@ abstract class BasePagingSource<Item : Any> : PagingSource<Int, Item>() {
 
     open val firstPageKey: Int get() = DEFAULT_FIRST_PAGE
 
-    override fun getRefreshKey(state: PagingState<Int, Item>): Int? = state.anchorPosition
+    override fun getRefreshKey(state: PagingState<Int, Item>): Int? = null
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Item> =
         try {
@@ -26,7 +26,5 @@ abstract class BasePagingSource<Item : Any> : PagingSource<Int, Item>() {
             LoadResult.Error(e)
         }
 
-    abstract suspend fun loadData(
-        pageKey: Int
-    ): List<Item>
+    abstract suspend fun loadData(pageKey: Int): List<Item>
 }

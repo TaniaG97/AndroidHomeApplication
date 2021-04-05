@@ -7,36 +7,25 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.androidhomeapplication.data.constans.Constants
 import com.example.androidhomeapplication.data.models.Movie
-import com.example.androidhomeapplication.data.paging.MoviePagingSource
-import com.example.androidhomeapplication.data.paging.SearchPagingSource
+import com.example.androidhomeapplication.data.paging.MoviesPagingSource
 import com.example.androidhomeapplication.data.repository.MoviesRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
 
 class MoviesListViewModel(
     private val moviesRepository: MoviesRepository
 ) : ViewModel() {
 
-    private val pagingConfig: PagingConfig =
-        PagingConfig(pageSize = Constants.DEFAULT_ITEM_PER_PAGE)
+    private var searchPagingSource = MoviesPagingSource(moviesRepository, null)
 
-    private var currentQueryValue: String? = null
-    val queryValue: String? get() = currentQueryValue
+    val movieItems: Flow<PagingData<Movie>> by lazy {
+        Pager(PagingConfig(pageSize = Constants.DEFAULT_ITEM_PER_PAGE)) {
+            searchPagingSource
+        }.flow.cachedIn(viewModelScope).debounce(500)
+    }
 
-    private var currentMoviesList: Flow<PagingData<Movie>>? = null
-    val moviesList:  Flow<PagingData<Movie>>? get() = currentMoviesList
-
-    fun loadData(queryString: String? = null) {
-        if (queryString.isNullOrEmpty()) {
-            currentQueryValue = null
-            currentMoviesList = Pager(pagingConfig) {
-                MoviePagingSource(moviesRepository)
-            }.flow.cachedIn(viewModelScope)
-        } else if (queryString != currentQueryValue) {
-            currentQueryValue = queryString
-            currentMoviesList = Pager(pagingConfig) {
-                SearchPagingSource(moviesRepository, queryString)
-            }.flow.cachedIn(viewModelScope)
-        }
+    fun loadData(queryString: String?) {
+        searchPagingSource = MoviesPagingSource(moviesRepository, queryString)
     }
 }
 

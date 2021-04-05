@@ -23,66 +23,78 @@ enum class ImageType(val size: String) {
 
 class MoviesRepository() {
     private val retrofit: Retrofit = RetrofitBuilder.buildRetrofit()
-    private val configurationService: ConfigurationService by lazy {  retrofit.create(ConfigurationService::class.java) }
+    private val configurationService: ConfigurationService by lazy {
+        retrofit.create(
+            ConfigurationService::class.java
+        )
+    }
     private val movieService: MoviesService by lazy { retrofit.create(MoviesService::class.java) }
 
     private val mutex = Mutex()
     private var genres: Map<Long, Genre>? = null
     private var configInfo: ConfigurationResponse? = null
 
-    suspend fun loadMovies(page: Int): List<Movie> = coroutineScope {
-        val movies = async { movieService.loadPopular(page = page).results }
-        val genresMap = async { getCachedGenresOrLoad() }
-        val posterImageUrl = getImageUrlByType(ImageType.POSTER)
-
-        movies.await().map { movie ->
-            val movieGenres = movie.genreIds.mapNotNull { singleGenreId -> genresMap.await()[singleGenreId] }
-            movie.mapToMovie(posterImageUrl, movieGenres)
-        }
-    }
-
-    suspend fun loadMovie(movieId: Long): MovieDetails = coroutineScope {
+    suspend fun loadMovieById(movieId: Long): MovieDetails = coroutineScope {
         val profileImageUrl = getImageUrlByType(ImageType.PROFILE)
         val backdropImageUrl = getImageUrlByType(ImageType.BACKDROP)
 
         val details = async { movieService.loadMovieDetails(movieId) }
-        val casts = async { movieService.loadMovieCredits(movieId).cast.map { castResponse ->
-            castResponse.mapToActor(profileImageUrl) }
+        val casts = async {
+            movieService.loadMovieCredits(movieId).cast.map { castResponse ->
+                castResponse.mapToActor(profileImageUrl)
+            }
         }
 
         details.await().mapToMovieDetails(backdropImageUrl, casts.await())
     }
 
-    suspend fun searchMovies(queryString: String, page: Int): List<Movie> = coroutineScope {
-        val movies = async { movieService.searchMovie(query = queryString, page = page).results }
+    suspend fun loadMovies(queryString: String?, page: Int): List<Movie> = coroutineScope {
+        val movies = async { loadData(queryString, page) }
         val genresMap = async { getCachedGenresOrLoad() }
         val posterImageUrl = getImageUrlByType(ImageType.POSTER)
 
         movies.await().map { movie ->
-            val movieGenres = movie.genreIds.mapNotNull { singleGenreId -> genresMap.await()[singleGenreId] }
+            val movieGenres =
+                movie.genreIds.mapNotNull { singleGenreId -> genresMap.await()[singleGenreId] }
             movie.mapToMovie(posterImageUrl, movieGenres)
         }
     }
 
-    suspend fun getCachedGenresOrLoad(): Map<Long, Genre> {
-        mutex.withLock {
-            if (genres == null) {
-                genres = movieService.loadGenres().genres.associateBy({genres -> genres.id }, {genreResponse ->  genreResponse.mapToGenre() })
-            }
+    private suspend fun loadData(
+        queryString: String?,
+        page: Int
+    ) = if (queryString.isNullOrEmpty()) {
+        movieService.loadPopular(page = page)
+    } else {
+        movieService.searchMovie(query = queryString, page = page)
+    }.results
+
+    private suspend fun getCachedGenresOrLoad(): Map<Long, Genre> = mutex.withLock {
+        val value = genres
+        if (value != null) {
+            value
+        } else {
+            val newInfo = movieService.loadGenres().genres.associateBy({ genres -> genres.id },
+                { genreResponse -> genreResponse.mapToGenre() })
+            genres = newInfo
+            newInfo
         }
-        return genres ?: mapOf()
     }
 
-    suspend fun getCachedConfigInfoOrLoad(): ConfigurationResponse? {
-        mutex.withLock {
-            if (configInfo == null) {
-                configInfo = configurationService.loadConfiguration()
-            }
+
+    private suspend fun getCachedConfigInfoOrLoad(): ConfigurationResponse = mutex.withLock {
+        val value = configInfo
+        if (value != null) {
+            value
+        } else {
+            val newInfo = configurationService.loadConfiguration()
+            configInfo = newInfo
+            newInfo
         }
-        return configInfo
     }
 
-    suspend fun getImageUrlByType(imageType: ImageType): String {
+
+    private suspend fun getImageUrlByType(imageType: ImageType): String {
         val configuration = getCachedConfigInfoOrLoad()
 
         val secureBaseURL = configuration?.images?.secureBaseUrl ?: SECURE_BASE_URL

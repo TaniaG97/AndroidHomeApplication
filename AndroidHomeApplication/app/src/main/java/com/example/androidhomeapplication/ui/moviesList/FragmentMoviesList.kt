@@ -32,8 +32,6 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
             (activity?.application as? RouterProvider)?.router?.navigateTo(MovieDetailsScreen(item.id))
         })
 
-    private var coroutineJob: Job? = null
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -42,34 +40,22 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
 
         initListeners()
 
-        binding.textInputLayout.editText?.setText(viewModel.queryValue)
-        loadData(viewModel.queryValue)
     }
 
     private fun initListeners() {
-        binding.searchButton.setOnClickListener {
-            val searchQuery = binding.textInputLayout.editText?.text.toString()
-            if (searchQuery.isNotEmpty()) {
-                loadData(searchQuery)
-            }
-        }
 
         binding.textInputLayout.editText?.doOnTextChanged { inputText, _, _, _ ->
-            if (inputText.isNullOrEmpty()) {
-                loadData()
-            }
+            viewModel.loadData(inputText.toString())
+            pagingAdapter.refresh()
         }
-    }
 
-    private fun loadData(query: String? = null) {
-        coroutineJob?.cancel()
-        viewModel.loadData(query)
-        coroutineJob = viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.moviesList?.collectLatest { data ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.movieItems.collectLatest { data ->
                 pagingAdapter.submitData(data)
             }
         }
     }
+
 }
 
 class MoviesListScreen : FragmentScreen(
