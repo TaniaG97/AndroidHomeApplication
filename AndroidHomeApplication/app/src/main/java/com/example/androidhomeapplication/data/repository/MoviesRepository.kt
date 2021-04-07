@@ -3,7 +3,6 @@ package com.example.androidhomeapplication.data.repository
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.models.MovieDetails
-import com.example.androidhomeapplication.data.remote.RetrofitBuilder
 import com.example.androidhomeapplication.data.remote.response.*
 import com.example.androidhomeapplication.data.remote.services.ConfigurationService
 import com.example.androidhomeapplication.data.remote.services.MoviesService
@@ -11,7 +10,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import retrofit2.Retrofit
 
 private const val SECURE_BASE_URL: String = "https://image.tmdb.org/t/p/"
 
@@ -33,9 +31,9 @@ class MoviesRepository(
 
     suspend fun loadMovieById(movieId: Long): MovieDetails = coroutineScope {
         val configurationInfo = async { getCachedConfigInfoOrLoad() }
-        val configurationInfoValue = configurationInfo.await()
-
         val details = async { movieService.loadMovieDetails(movieId) }
+
+        val configurationInfoValue = configurationInfo.await()
         val casts = async {
             movieService.loadMovieCredits(movieId).cast.map { castResponse ->
                 castResponse.mapToActor(configurationInfoValue.getImageUrlByType(ImageType.PROFILE))
@@ -49,9 +47,9 @@ class MoviesRepository(
     }
 
     suspend fun loadMovies(queryString: String?, page: Int): List<Movie> = coroutineScope {
-        val movies = async { selectApiCallForMoviesData(queryString, page) }
-        val genresMap = async { getCachedGenresOrLoad() }
         val configurationInfo = async { getCachedConfigInfoOrLoad() }
+        val movies = async { getMovieDataSource(queryString, page) }
+        val genresMap = async { getCachedGenresOrLoad() }
 
         val posterImageUrl = configurationInfo.await().getImageUrlByType(ImageType.POSTER)
         val genresMapValue = genresMap.await()
@@ -62,7 +60,7 @@ class MoviesRepository(
         }
     }
 
-    private suspend fun selectApiCallForMoviesData(
+    private suspend fun getMovieDataSource(
         queryString: String?,
         page: Int
     ): List<MovieResponse> = if (queryString.isNullOrEmpty()) {

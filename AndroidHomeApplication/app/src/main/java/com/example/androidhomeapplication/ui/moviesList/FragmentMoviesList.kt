@@ -31,8 +31,6 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
             (activity?.application as? RouterProvider)?.router?.navigateTo(MovieDetailsScreen(item.id))
         })
 
-    private var lastSearchValue: String? = null
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -47,18 +45,17 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
 
         binding.textInputLayout.textInputEditText.textChanges()
             .debounce(500)
-            .flatMapLatest { value: CharSequence? ->
+            .map { charSequence -> charSequence?.toString() }
+            .distinctUntilChanged()
+            .flatMapLatest { value ->
                 flow {
-                    val newStringQuery = value.toString()
-                    if (lastSearchValue != newStringQuery) {
-                        lastSearchValue = newStringQuery
-                        viewModel.loadData(newStringQuery)
-                        pagingAdapter.refresh()
-                    }
+                    viewModel.loadData(value)
+                    pagingAdapter.refresh()
                     emit(value)
                 }
             }
-            .launchIn(lifecycleScope)
+
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.movieItems.collectLatest { data ->
