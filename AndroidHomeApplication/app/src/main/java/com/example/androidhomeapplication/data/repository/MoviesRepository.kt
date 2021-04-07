@@ -35,7 +35,7 @@ class MoviesRepository(
 
         val configurationInfoValue = configurationInfo.await()
         val profileImageUrl = configurationInfoValue.getImageUrlByType(ImageType.PROFILE)
-        val backdropImageUrl = configurationInfoValue.getImageUrlByType(ImageType.PROFILE)
+        val backdropImageUrl = configurationInfoValue.getImageUrlByType(ImageType.BACKDROP)
 
         val casts = async {
             movieService.loadMovieCredits(movieId).cast.map { castResponse ->
