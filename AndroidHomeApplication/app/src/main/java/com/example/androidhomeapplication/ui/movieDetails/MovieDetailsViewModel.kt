@@ -1,19 +1,19 @@
-package com.example.androidhomeapplication.fragments.movieDetails
+package com.example.androidhomeapplication.ui.movieDetails
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.android.academy.fundamentals.homework.data.MovieRepository
 import com.example.androidhomeapplication.DataResult
-import com.example.androidhomeapplication.models.Movie
+import com.example.androidhomeapplication.data.models.MovieDetails
+import com.example.androidhomeapplication.data.repository.MoviesRepository
 import kotlinx.coroutines.launch
 
 class MovieDetailsViewModel(
-    private val movieRepository: MovieRepository,
+    private val movieRepository: MoviesRepository,
     private val movieId: Long
 ) : ViewModel() {
 
-    private val mutableMovie = MutableLiveData<DataResult<Movie>>()
-    val movie: LiveData<DataResult<Movie>> get() = mutableMovie
+    private val mutableMovie = MutableLiveData<DataResult<MovieDetails>>()
+    val movie: LiveData<DataResult<MovieDetails>> get() = mutableMovie
 
     init {
         getMovieDetails()
@@ -24,12 +24,8 @@ class MovieDetailsViewModel(
 
         viewModelScope.launch {
             mutableMovie.value = try {
-                val result = movieRepository.getMovie(movieId)
-                if (result != null) {
-                    DataResult.Success(result)
-                } else {
-                    DataResult.EmptyResult()
-                }
+                val result = movieRepository.loadMovieById(movieId)
+                DataResult.Success(result)
 
             } catch (throwable: Throwable) {
                 Log.e("MovieDetailsViewModel", "getMovieDetails: Failed", throwable)
@@ -40,7 +36,7 @@ class MovieDetailsViewModel(
 }
 
 class MovieDetailsViewModelFactory(
-    private val movieRepository: MovieRepository,
+    private val movieRepository: MoviesRepository,
     private val movieId: Long
 ) : ViewModelProvider.Factory {
 

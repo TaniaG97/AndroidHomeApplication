@@ -1,23 +1,22 @@
-package com.example.androidhomeapplication.fragments.moviesList
+package com.example.androidhomeapplication.ui.moviesList
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.bumptech.glide.Glide
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.ItemMoviesListBinding
 import com.example.androidhomeapplication.loadImageWithGlide
-import com.example.androidhomeapplication.models.Movie
+import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.setImageActiveState
 import com.example.androidhomeapplication.setRating
 
 class MoviesListAdapter(
     private val onItemClick: ((Movie) -> Unit)
-) : ListAdapter<Movie, MovieItemViewHolder>(TaskDiffCallBack()) {
+) : PagingDataAdapter<Movie, MovieItemViewHolder>(TaskDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieItemViewHolder {
         val view =
@@ -25,11 +24,18 @@ class MoviesListAdapter(
         return MovieItemViewHolder(view, onItemClick)
     }
 
-    override fun onBindViewHolder(holder: MovieItemViewHolder, position: Int) = holder.bind(getItem(position))
+    override fun onBindViewHolder(holder: MovieItemViewHolder, position: Int) {
+        val item: Movie? = getItem(position)
+        if (item != null) {
+            holder.bind(item)
+        }
+    }
 }
 
 private class TaskDiffCallBack : DiffUtil.ItemCallback<Movie>() {
-    override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean = (oldItem.id == newItem.id)
+    override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean =
+        (oldItem.id == newItem.id)
+
     override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean = (oldItem === newItem)
 }
 
@@ -39,7 +45,7 @@ class MovieItemViewHolder(
 ) : RecyclerView.ViewHolder(itemView) {
 
     private val binding by viewBinding(ItemMoviesListBinding::bind)
-    private var itemData: Movie?=null
+    private var itemData: Movie? = null
 
     init {
         itemView.setOnClickListener {
@@ -50,12 +56,13 @@ class MovieItemViewHolder(
     fun bind(itemData: Movie) {
         this.itemData = itemData
         binding.itemImage.loadImageWithGlide(itemData.imageUrl)
-        binding.itemTextAge.text = itemView.context.getString(R.string.age_template, itemData.pgAge)
+        binding.itemTextAge.text = itemView.context.getString(R.string.age_template, itemData.ageLimit)
         binding.itemIconLike.setImageActiveState(isActive = itemData.isLiked)
-        binding.itemMoveTypes.text = itemData.genres.joinToString(", ") {genre ->  genre.name }
+        binding.itemMoveTypes.text = itemData.genres.joinToString(", ") { genre -> genre.name }
         binding.itemStars.setRating(itemData.rating)
-        binding.itemTextReviews.text = itemView.context?.getString(R.string.reviews_template, itemData.reviewCount)
+        binding.itemTextReviews.text =
+            itemView.context?.getString(R.string.reviews_template, itemData.reviewCount)
         binding.itemTextTitle.text = itemData.title
-        binding.itemMoveTime.text = itemView.context?.getString(R.string.time_template, itemData.runningTime)
+        binding.itemMoveTime.text = "" //todo change to show movie release date
     }
 }

@@ -1,9 +1,8 @@
-package com.example.androidhomeapplication.fragments.movieDetails
+package com.example.androidhomeapplication.ui.movieDetails
 
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.viewModels
@@ -11,8 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.androidhomeapplication.*
 import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBinding
-import com.example.androidhomeapplication.models.Actor
-import com.example.androidhomeapplication.models.Movie
+import com.example.androidhomeapplication.data.models.Actor
+import com.example.androidhomeapplication.data.models.MovieDetails
 import com.example.androidhomeapplication.navigation.RouterProvider
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
@@ -32,7 +31,6 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
         super.onViewCreated(view, savedInstanceState)
 
         initViews()
-
         viewModel.movie.observe(viewLifecycleOwner, ::setResult)
     }
 
@@ -46,9 +44,9 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
         }
     }
 
-    private fun setResult(result: DataResult<Movie>) =
+    private fun setResult(result: DataResult<MovieDetails>) =
         when (result) {
-            is DataResult.Success<Movie> -> {
+            is DataResult.Success<MovieDetails> -> {
                 setMovieFields(result.value)
             }
             is DataResult.EmptyResult -> {
@@ -61,13 +59,13 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
             is DataResult.Loading -> Unit
         }
 
-    private fun setMovieFields(movieData: Movie) {
-        binding.backgroundImage.loadImageWithGlide(movieData.detailImageUrl)
-        binding.textAge.text = context?.getString(R.string.age_template, movieData.pgAge)
-        binding.textTitle.text = movieData.title
-        binding.textMoveTypes.text = movieData.genres.joinToString(", ") { genre -> genre.name }
-        binding.stars.setRating(movieData.rating)
-        binding.textReviews.text = getString(R.string.reviews_template, movieData.reviewCount)
+    private fun setMovieFields(movieData: MovieDetails) {
+        binding.backgroundImage.loadImageWithGlide(movieData.movieBaseInfo.imageUrl)
+        binding.textAge.text = context?.getString(R.string.age_template, movieData.movieBaseInfo.ageLimit)
+        binding.textTitle.text = movieData.movieBaseInfo.title
+        binding.textMoveTypes.text = movieData.movieBaseInfo.genres.joinToString(", ") { genre -> genre.name }
+        binding.stars.setRating(movieData.movieBaseInfo.rating)
+        binding.textReviews.text = getString(R.string.reviews_template, movieData.movieBaseInfo.reviewCount)
         binding.textStorylineDescription.text = movieData.storyLine
         updateAdapter(movieData.actors)
     }

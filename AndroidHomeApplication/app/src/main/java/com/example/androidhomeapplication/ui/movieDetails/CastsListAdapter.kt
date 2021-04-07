@@ -1,4 +1,4 @@
-package com.example.androidhomeapplication.fragments.movieDetails
+package com.example.androidhomeapplication.ui.movieDetails
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +10,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.androidhomeapplication.R
 import com.example.androidhomeapplication.databinding.ItemMovieCastBinding
 import com.example.androidhomeapplication.loadImageWithGlide
-import com.example.androidhomeapplication.models.Actor
+import com.example.androidhomeapplication.data.models.Actor
 
 class CastsListAdapter() : ListAdapter<Actor, CastItemViewHolder>(TaskDiffCallBack()) {
 

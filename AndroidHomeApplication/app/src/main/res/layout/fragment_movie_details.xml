@@ -33,7 +33,7 @@
             android:layout_height="298dp"
             android:scaleType="centerCrop"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/background_image" />
+            tools:srcCompat="@drawable/background_image" />
 
         <View
             android:id="@+id/transparent_gradient"
