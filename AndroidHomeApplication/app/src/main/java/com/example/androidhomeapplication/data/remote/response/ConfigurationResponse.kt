@@ -1,5 +1,6 @@
 package com.example.androidhomeapplication.data.remote.response
 
+import com.example.androidhomeapplication.data.repository.ImageType
 import kotlinx.serialization.*
 
 @Serializable
@@ -34,3 +35,13 @@ data class Images(
     @SerialName("still_sizes")
     val stillSizes: List<String>
 )
+
+fun ConfigurationResponse.getImageUrlByType(imageType: ImageType): String {
+    val secureBaseURL = this.images.secureBaseUrl
+    val imageSize = when (imageType) {
+        ImageType.POSTER -> this.images.posterSizes.last()
+        ImageType.BACKDROP -> this.images.backdropSizes.last()
+        ImageType.PROFILE -> this.images.profileSizes.last()
+    }
+    return secureBaseURL + imageSize
+}

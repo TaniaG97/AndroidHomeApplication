@@ -32,5 +32,4 @@ interface MoviesService {
         @Query("query") query: String?,
         @Query("page") page: Int
     ): MoviesListResponse
-
 }

@@ -21,7 +21,7 @@ class MoviesListViewModel(
     val movieItems: Flow<PagingData<Movie>> by lazy {
         Pager(PagingConfig(pageSize = Constants.DEFAULT_ITEM_PER_PAGE)) {
             searchPagingSource
-        }.flow.cachedIn(viewModelScope).debounce(500)
+        }.flow.cachedIn(viewModelScope)
     }
 
     fun loadData(queryString: String?) {

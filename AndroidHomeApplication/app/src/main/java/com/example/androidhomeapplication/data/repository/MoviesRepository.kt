@@ -21,66 +21,69 @@ enum class ImageType(val size: String) {
     PROFILE(size = "w185")
 }
 
-class MoviesRepository() {
-    private val retrofit: Retrofit = RetrofitBuilder.buildRetrofit()
-    private val configurationService: ConfigurationService by lazy {
-        retrofit.create(
-            ConfigurationService::class.java
-        )
-    }
-    private val movieService: MoviesService by lazy { retrofit.create(MoviesService::class.java) }
+class MoviesRepository(
+    private val movieService: MoviesService,
+    private val configurationService: ConfigurationService
+) {
+
 
     private val mutex = Mutex()
     private var genres: Map<Long, Genre>? = null
     private var configInfo: ConfigurationResponse? = null
 
     suspend fun loadMovieById(movieId: Long): MovieDetails = coroutineScope {
-        val profileImageUrl = getImageUrlByType(ImageType.PROFILE)
-        val backdropImageUrl = getImageUrlByType(ImageType.BACKDROP)
+        val configurationInfo = async { getCachedConfigInfoOrLoad() }
+        val configurationInfoValue = configurationInfo.await()
 
         val details = async { movieService.loadMovieDetails(movieId) }
         val casts = async {
             movieService.loadMovieCredits(movieId).cast.map { castResponse ->
-                castResponse.mapToActor(profileImageUrl)
+                castResponse.mapToActor(configurationInfoValue.getImageUrlByType(ImageType.PROFILE))
             }
         }
 
-        details.await().mapToMovieDetails(backdropImageUrl, casts.await())
+        details.await().mapToMovieDetails(
+            configurationInfoValue.getImageUrlByType(ImageType.BACKDROP),
+            casts.await()
+        )
     }
 
     suspend fun loadMovies(queryString: String?, page: Int): List<Movie> = coroutineScope {
-        val movies = async { loadData(queryString, page) }
+        val movies = async { selectApiCallForMoviesData(queryString, page) }
         val genresMap = async { getCachedGenresOrLoad() }
-        val posterImageUrl = getImageUrlByType(ImageType.POSTER)
+        val configurationInfo = async { getCachedConfigInfoOrLoad() }
 
+        val posterImageUrl = configurationInfo.await().getImageUrlByType(ImageType.POSTER)
+        val genresMapValue = genresMap.await()
         movies.await().map { movie ->
             val movieGenres =
-                movie.genreIds.mapNotNull { singleGenreId -> genresMap.await()[singleGenreId] }
+                movie.genreIds.mapNotNull { singleGenreId -> genresMapValue[singleGenreId] }
             movie.mapToMovie(posterImageUrl, movieGenres)
         }
     }
 
-    private suspend fun loadData(
+    private suspend fun selectApiCallForMoviesData(
         queryString: String?,
         page: Int
-    ) = if (queryString.isNullOrEmpty()) {
-        movieService.loadPopular(page = page)
-    } else {
-        movieService.searchMovie(query = queryString, page = page)
-    }.results
+    ): List<MovieResponse> = if (queryString.isNullOrEmpty()) {
+            movieService.loadPopular(page = page)
+        } else {
+            movieService.searchMovie(query = queryString, page = page)
+        }.results
 
     private suspend fun getCachedGenresOrLoad(): Map<Long, Genre> = mutex.withLock {
         val value = genres
         if (value != null) {
             value
         } else {
-            val newInfo = movieService.loadGenres().genres.associateBy({ genres -> genres.id },
-                { genreResponse -> genreResponse.mapToGenre() })
+            val newInfo = movieService.loadGenres().genres.associateBy(
+                { genres -> genres.id },
+                { genreResponse -> genreResponse.mapToGenre() }
+            )
             genres = newInfo
             newInfo
         }
     }
-
 
     private suspend fun getCachedConfigInfoOrLoad(): ConfigurationResponse = mutex.withLock {
         val value = configInfo
@@ -91,22 +94,5 @@ class MoviesRepository() {
             configInfo = newInfo
             newInfo
         }
-    }
-
-
-    private suspend fun getImageUrlByType(imageType: ImageType): String {
-        val configuration = getCachedConfigInfoOrLoad()
-
-        val secureBaseURL = configuration?.images?.secureBaseUrl ?: SECURE_BASE_URL
-        val imageSize = when (imageType) {
-            ImageType.POSTER -> configuration?.images?.posterSizes?.last()
-                ?: "${ImageType.POSTER.size}/"
-            ImageType.BACKDROP -> configuration?.images?.backdropSizes?.last()
-                ?: "${ImageType.BACKDROP.size}/"
-            ImageType.PROFILE -> configuration?.images?.profileSizes?.last()
-                ?: "${ImageType.PROFILE.size}/"
-        }
-
-        return secureBaseURL + imageSize
     }
 }

@@ -19,5 +19,11 @@ class App : Application(), RouterProvider, NavigatorHolderProvider, RepositoryPr
     override val router: Router get() = cicerone.router
     override val navigatorHolder: NavigatorHolder get() = cicerone.getNavigatorHolder()
 
-    override val movieRepository: MoviesRepository by lazy { MoviesRepository() }
+    private val retrofit: Retrofit = RetrofitBuilder.buildRetrofit()
+    override val movieRepository: MoviesRepository by lazy {
+        MoviesRepository(
+            retrofit.create(MoviesService::class.java),
+            retrofit.create(ConfigurationService::class.java)
+        )
+    }
 }
