@@ -47,14 +47,10 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
             .debounce(500)
             .map { charSequence -> charSequence?.toString() }
             .distinctUntilChanged()
-            .flatMapLatest { value ->
-                flow {
-                    viewModel.loadData(value)
-                    pagingAdapter.refresh()
-                    emit(value)
-                }
+            .map { value ->
+                viewModel.loadData(value)
+                pagingAdapter.refresh()
             }
-
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewLifecycleOwner.lifecycleScope.launch {
