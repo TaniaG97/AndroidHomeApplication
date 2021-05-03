@@ -1,5 +1,10 @@
 package com.example.androidhomeapplication.data.repository
 
+import androidx.annotation.WorkerThread
+import com.example.androidhomeapplication.data.db.FilmDatabase
+import com.example.androidhomeapplication.data.db.MovieDbEntity
+import com.example.androidhomeapplication.data.db.mapToMovie
+import com.example.androidhomeapplication.data.models.Actor
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.models.MovieDetails
@@ -20,11 +25,10 @@ enum class ImageType(val size: String) {
 }
 
 class MoviesRepository(
+    private val db: FilmDatabase,
     private val movieService: MoviesService,
     private val configurationService: ConfigurationService
 ) {
-
-
     private val mutex = Mutex()
     private var genres: Map<Long, Genre>? = null
     private var configInfo: ConfigurationResponse? = null
@@ -59,18 +63,24 @@ class MoviesRepository(
         movies.await().map { movie ->
             val movieGenres =
                 movie.genreIds.mapNotNull { singleGenreId -> genresMapValue[singleGenreId] }
+//            db.filmDao().saveMovieItem(movie.mapToMovieDbEntity(posterImageUrl, movieGenres))
             movie.mapToMovie(posterImageUrl, movieGenres)
         }
     }
+
+//    suspend fun getMoviesFromDb():List<Movie> = coroutineScope {
+//        db.filmDao().getMovies().map { movieDbEntity -> movieDbEntity.mapToMovie() }
+//    }
 
     private suspend fun getMovieDataSource(
         queryString: String?,
         page: Int
     ): List<MovieResponse> = if (queryString.isNullOrEmpty()) {
-            movieService.loadPopular(page = page)
-        } else {
-            movieService.searchMovie(query = queryString, page = page)
-        }.results
+        movieService.loadPopular(page = page)
+    } else {
+        movieService.searchMovie(query = queryString, page = page)
+    }.results
+
 
     private suspend fun getCachedGenresOrLoad(): Map<Long, Genre> = mutex.withLock {
         val value = genres

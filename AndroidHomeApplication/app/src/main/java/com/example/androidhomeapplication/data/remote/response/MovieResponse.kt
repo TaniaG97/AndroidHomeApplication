@@ -1,55 +1,57 @@
 package com.example.androidhomeapplication.data.remote.response
 
+import android.os.Parcelable
 import com.example.androidhomeapplication.Utils
+import com.example.androidhomeapplication.data.db.MovieDbEntity
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.squareup.moshi.Json
+import kotlinx.android.parcel.Parcelize
 
-@Serializable
+@Parcelize
 data class MovieResponse(
-    @SerialName("adult")
+    @Json(name = "adult")
     val adult: Boolean,
 
-    @SerialName("backdrop_path")
+    @Json(name = "backdrop_path")
     val backdropPath: String?,
 
-    @SerialName("genre_ids")
+    @Json(name = "genre_ids")
     val genreIds: List<Long>,
 
-    @SerialName("id")
+    @Json(name = "id")
     val id: Int,
 
-    @SerialName("original_language")
+    @Json(name = "original_language")
     val originalLanguage: String,
 
-    @SerialName("original_title")
+    @Json(name = "original_title")
     val originalTitle: String,
 
-    @SerialName("overview")
+    @Json(name = "overview")
     val overview: String,
 
-    @SerialName("popularity")
+    @Json(name = "popularity")
     val popularity: Double,
 
-    @SerialName("poster_path")
+    @Json(name = "poster_path")
     val posterPath: String?,
 
-    @SerialName("release_date")
+    @Json(name = "release_date")
     val releaseDate: String,
 
-    @SerialName("title")
+    @Json(name = "title")
     val title: String,
 
-    @SerialName("video")
+    @Json(name = "video")
     val video: Boolean,
 
-    @SerialName("vote_average")
+    @Json(name = "vote_average")
     val voteAverage: Double,
 
-    @SerialName("vote_count")
+    @Json(name = "vote_count")
     val voteCount: Long
-)
+) : Parcelable
 
 fun MovieResponse.mapToMovie(posterUrl: String, genres: List<Genre>): Movie =
     Movie(
@@ -60,5 +62,19 @@ fun MovieResponse.mapToMovie(posterUrl: String, genres: List<Genre>): Movie =
         reviewCount = this.voteCount,
         ageLimit = Utils.getAgeLimit(this.adult),
         isLiked = false,
+        genres = genres
+    )
+
+fun MovieResponse.mapToMovieDbEntity(posterUrl: String, genres: List<Genre>): MovieDbEntity =
+    MovieDbEntity(
+        id = this.id.toLong(),
+        title = this.title,
+        imageUrl = posterUrl + this.posterPath,
+        rating = this.voteAverage.toInt(),
+        reviewCount = this.voteCount,
+        ageLimit = Utils.getAgeLimit(this.adult),
+        isLiked = false,
         genres = genres,
-        )
+        storyLine = "",
+        actors = listOf()
+    )

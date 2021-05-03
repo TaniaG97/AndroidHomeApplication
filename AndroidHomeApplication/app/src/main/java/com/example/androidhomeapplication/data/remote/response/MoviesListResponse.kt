@@ -1,18 +1,20 @@
 package com.example.androidhomeapplication.data.remote.response
 
-import kotlinx.serialization.*
+import android.os.Parcelable
+import com.squareup.moshi.Json
+import kotlinx.android.parcel.Parcelize
 
-@Serializable
+@Parcelize
 data class MoviesListResponse(
-    @SerialName("page")
+    @Json(name = "page")
     val page: Long,
 
-    @SerialName("results")
+    @Json(name = "results")
     val results: List<MovieResponse>,
 
-    @SerialName("total_results")
+    @Json(name = "total_results")
     val totalResults: Long,
 
-    @SerialName("total_pages")
+    @Json(name = "total_pages")
     val totalPages: Long
-)
+) : Parcelable

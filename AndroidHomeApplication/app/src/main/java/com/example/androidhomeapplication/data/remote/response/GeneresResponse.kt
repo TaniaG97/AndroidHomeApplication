@@ -1,24 +1,27 @@
 package com.example.androidhomeapplication.data.remote.response
 
+import android.os.Parcelable
 import com.example.androidhomeapplication.data.models.Actor
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.MovieDetails
+import com.squareup.moshi.Json
+import kotlinx.android.parcel.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
+@Parcelize
 data class GenresResponse(
-    @SerialName("genres")
+    @Json(name = "genres")
     val genres: List<GenreResponse>
-)
+) : Parcelable
 
-@Serializable
-data class GenreResponse (
-    @SerialName("id")
+@Parcelize
+data class GenreResponse(
+    @Json(name = "id")
     val id: Long,
-    @SerialName("name")
+    @Json(name = "name")
     val name: String
-)
+) : Parcelable
 
 fun GenreResponse.mapToGenre(): Genre =
     Genre(
