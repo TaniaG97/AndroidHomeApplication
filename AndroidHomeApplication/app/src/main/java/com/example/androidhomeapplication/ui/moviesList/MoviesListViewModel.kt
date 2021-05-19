@@ -1,32 +1,47 @@
 package com.example.androidhomeapplication.ui.moviesList
 
 import androidx.lifecycle.*
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import com.example.androidhomeapplication.data.constans.Constants
+import com.example.androidhomeapplication.DataResult
 import com.example.androidhomeapplication.data.models.Movie
-import com.example.androidhomeapplication.data.paging.MoviesPagingSource
 import com.example.androidhomeapplication.data.repository.MoviesRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.launch
 
 class MoviesListViewModel(
     private val moviesRepository: MoviesRepository
 ) : ViewModel() {
+//    private val _moviesList = MutableLiveData<DataResult<List<Movie>>>()
+//    val moviesList: LiveData<DataResult<List<Movie>>> get() = _moviesList
 
-    private var searchPagingSource = MoviesPagingSource(moviesRepository, null)
+    val moviesFromFlow: Flow<DataResult<List<Movie>>> = moviesRepository.moviesFlow
+    var currentPage = 0
 
-    val movieItems: Flow<PagingData<Movie>> by lazy {
-        Pager(PagingConfig(pageSize = Constants.DEFAULT_ITEM_PER_PAGE)) {
-            searchPagingSource
-        }.flow.cachedIn(viewModelScope)
+    init {
+//        loadMoviePage()
     }
 
-    fun loadData(queryString: String?) {
-        searchPagingSource = MoviesPagingSource(moviesRepository, queryString)
+    fun loadMoviePage() {
+        currentPage++
+        viewModelScope.launch {
+            moviesRepository.loadMoviePage(currentPage)
+        }
     }
+
+//    init {
+//        getMoviesList("",1)
+//    }
+//
+//    fun getMoviesList(query:String, page:Int) {
+//        _moviesList.value = DataResult.Loading()
+//
+//        viewModelScope.launch {
+//            _moviesList.value = try {
+//                DataResult.Success(moviesRepository.loadMovies(query,page))
+//            } catch (throwable: Throwable) {
+//                DataResult.Error(throwable)
+//            }
+//        }
+//    }
 }
 
 class MoviesListViewModelFactory(

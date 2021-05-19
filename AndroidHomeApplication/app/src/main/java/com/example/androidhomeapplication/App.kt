@@ -1,7 +1,6 @@
 package com.example.androidhomeapplication
 
 import android.app.Application
-import com.example.androidhomeapplication.data.db.Database
 import com.example.androidhomeapplication.data.db.DbProvider
 import com.example.androidhomeapplication.data.db.FilmDatabase
 import com.example.androidhomeapplication.data.remote.RetrofitBuilder
