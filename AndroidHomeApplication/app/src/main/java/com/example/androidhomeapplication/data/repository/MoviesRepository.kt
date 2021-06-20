@@ -35,35 +35,29 @@ class MoviesRepository(
 
     private val moviePageToLoad = MutableStateFlow(1)
     private val queryForSearch = MutableStateFlow("")
+    val searchFlow = MutableStateFlow<DataResult<List<Movie>>>(DataResult.Success(listOf()))
 
-    val loadMoviePageFlow: Flow<DataResult<Int>> = moviePageToLoad
-        .flatMapLatest { page ->
-            flow {
-                emit(DataResult.Loading())
-
-                val movies = loadMovies("", page)
-                if (!movies.isNullOrEmpty()) {
-                    if (page == 1) {
-                        db.filmDao().clearTable()
-                    }
-                    db.filmDao().insertAll(movies.map { movie -> movie.mapToMovieDbEntity() })
-                } else {
-                    emit(DataResult.Error(Throwable("Some Error Message")))
+    val loadMoviePageFlow: Flow<DataResult<Int>> =
+    moviePageToLoad.combineTransform(queryForSearch) { page, query ->
+        emit(DataResult.Loading())
+        val movies = loadMovies(query, page)
+        if (movies != null) {
+            if (query.isEmpty()){
+                if (page == 1) {
+                    db.filmDao().clearTable()
                 }
-
-                emit(DataResult.Success(page))
+                db.filmDao().insertAll(movies.map { movie -> movie.mapToMovieDbEntity() })
+            }else{
+                if (page == 1) {
+                    searchFlow.emit(DataResult.Success(listOf()))
+                }
+                searchFlow.emit(DataResult.Success(movies))
             }
+            emit(DataResult.Success(page))
+        } else {
+            emit(DataResult.Error(Throwable("Some Error Message")))
         }
-
-    val searchFlow: Flow<DataResult<List<Movie>>> =
-        moviePageToLoad.combine(queryForSearch) { page, query ->
-            val movies = loadMovies(query, page)
-            if (!movies.isNullOrEmpty()) {
-                DataResult.Success(movies)
-            } else {
-                DataResult.Error(Throwable("Some Error Message"))
-            }
-        }
+    }
 
     val popularMoviesFlow: Flow<DataResult<List<Movie>>> = db.filmDao().getPopularMoviesFlow()
         .map { movieDbEntity ->
@@ -100,7 +94,7 @@ class MoviesRepository(
         )
     }
 
-    suspend fun loadMovies(queryString: String?, page: Int): List<Movie> = coroutineScope {
+    suspend fun loadMovies(queryString: String?, page: Int): List<Movie>? = coroutineScope {
         val configurationInfo = async { getCachedConfigInfoOrLoad() }
         val movies = async { getMovieDataSource(queryString, page) }
         val genresMap = async { getCachedGenresOrLoad() }

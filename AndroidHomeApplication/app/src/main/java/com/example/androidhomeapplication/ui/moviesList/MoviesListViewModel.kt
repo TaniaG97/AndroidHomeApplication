@@ -13,7 +13,7 @@ class MoviesListViewModel(
     private val moviesRepository: MoviesRepository
 ) : ViewModel() {
 
-    private val isSearchModFlow = MutableStateFlow(false)
+    val isSearchModFlow = MutableStateFlow(false)
 
     var moviesFromFlow: Flow<DataResult<List<Movie>>> =
         isSearchModFlow.flatMapLatest { isSearchMod ->

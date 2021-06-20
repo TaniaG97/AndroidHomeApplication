@@ -48,7 +48,15 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
             viewModel.moviesFromFlow.collect { moviesDataResult ->
                 when (moviesDataResult) {
                     is DataResult.Success<List<Movie>> -> {
-                        adapter.submitList(moviesDataResult.value)
+                        if (!viewModel.isSearchModFlow.value){
+                            adapter.submitList(moviesDataResult.value)
+                        }else{
+                            val set = mutableSetOf<Movie>()
+                            set.addAll(adapter.currentList)
+                            set.addAll(moviesDataResult.value)
+                            adapter.submitList(set.toList())
+                        }
+//                        adapter.submitList(moviesDataResult.value)
                     }
                     is DataResult.EmptyResult -> {
                         showShortToast(R.string.empty_movies_list)
@@ -80,7 +88,7 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
         }
 
         binding.textInputLayout.textInputEditText.textChanges()
-            .debounce(500)
+            .debounce(300)
             .map { charSequence -> charSequence?.toString() }
             .distinctUntilChanged()
             .map { value ->
