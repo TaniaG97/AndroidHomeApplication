@@ -5,6 +5,7 @@ import com.example.androidhomeapplication.Utils
 import com.example.androidhomeapplication.data.db.MovieDbEntity
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
+import com.example.androidhomeapplication.data.models.mapToMovieDbEntity
 import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
 
@@ -38,7 +39,7 @@ data class MovieResponse(
     val posterPath: String?,
 
     @Json(name = "release_date")
-    val releaseDate: String,
+    val releaseDate: String?,
 
     @Json(name = "title")
     val title: String,
@@ -62,7 +63,8 @@ fun MovieResponse.mapToMovie(posterUrl: String, genres: List<Genre>): Movie =
         reviewCount = this.voteCount,
         ageLimit = Utils.getAgeLimit(this.adult),
         isLiked = false,
-        genres = genres
+        genres = genres,
+        popularity = this.popularity
     )
 
 fun MovieResponse.mapToMovieDbEntity(posterUrl: String, genres: List<Genre>): MovieDbEntity =
@@ -76,5 +78,6 @@ fun MovieResponse.mapToMovieDbEntity(posterUrl: String, genres: List<Genre>): Mo
         isLiked = false,
         genres = genres,
         storyLine = "",
-        actors = listOf()
+        actors = listOf(),
+        popularity = this.popularity
     )

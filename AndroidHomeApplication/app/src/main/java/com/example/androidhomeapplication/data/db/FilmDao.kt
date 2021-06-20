@@ -14,11 +14,11 @@ interface FilmDao {
     @Query("select * from movies WHERE id=:movieId")
     suspend fun getMovieById(movieId: Long): MovieDbEntity?
 
-    @Query("select * from movies ")
-    fun getMoviesFlow(): Flow<List<MovieDbEntity>>
+    @Query("select * from movies ORDER BY popularity DESC")
+    fun getPopularMoviesFlow(): Flow<List<MovieDbEntity>>
 
-    @Query("select * from movies ")
-    suspend fun getMovies(): List<MovieDbEntity>
+    @Query("select * from movies ORDER BY popularity DESC")
+    suspend fun getPopularMovies(): List<MovieDbEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(movieDbEntities: List<MovieDbEntity>)

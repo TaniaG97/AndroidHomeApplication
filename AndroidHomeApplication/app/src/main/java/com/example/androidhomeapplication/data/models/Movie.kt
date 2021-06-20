@@ -10,7 +10,8 @@ data class Movie(
     val reviewCount: Long,
     val isLiked: Boolean,
     val rating: Int,
-    val imageUrl: String?
+    val imageUrl: String?,
+    val popularity: Double
 )
 
 fun Movie.mapToMovieDbEntity() =
@@ -24,5 +25,6 @@ fun Movie.mapToMovieDbEntity() =
         isLiked = this.isLiked,
         genres = this.genres,
         actors = listOf(),
-        storyLine = ""
+        storyLine = "",
+        popularity = this.popularity
     )

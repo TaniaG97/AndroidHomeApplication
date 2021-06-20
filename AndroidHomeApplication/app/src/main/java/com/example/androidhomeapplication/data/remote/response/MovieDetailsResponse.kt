@@ -83,7 +83,8 @@ fun MovieDetailsResponse.mapToMovieDetails(backdropUrl: String, casts: List<Acto
             reviewCount = this.voteCount,
             isLiked = false,
             rating = this.voteAverage.toInt(),
-            imageUrl = backdropUrl + this.backdropPath
+            imageUrl = backdropUrl + this.backdropPath,
+            popularity = this.popularity
         ),
         storyLine = this.overview,
         actors = casts

@@ -2,7 +2,6 @@ package com.example.androidhomeapplication.data.repository
 
 import com.example.androidhomeapplication.DataResult
 import com.example.androidhomeapplication.data.db.FilmDatabase
-import com.example.androidhomeapplication.data.db.MovieDbEntity
 import com.example.androidhomeapplication.data.db.mapToMovie
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
@@ -34,32 +33,52 @@ class MoviesRepository(
     private var genres: Map<Long, Genre>? = null
     private var configInfo: ConfigurationResponse? = null
 
-    private val moviePageToLoad = MutableSharedFlow<Int>()
+    private val moviePageToLoad = MutableStateFlow(1)
+    private val queryForSearch = MutableStateFlow("")
 
-    private val cachingMoviesFlow =
-        moviePageToLoad
-            .flatMapLatest { page ->
-                fetchWithCachingFlow(
-                    databaseQuery = {
-                        db.filmDao().getMovies().map { movieDbEntity -> movieDbEntity.mapToMovie() }
-                    },
-                    networkCall = {loadMovies(page)},
-                    saveCallResult = { data ->
-                        if (page==1){
-                            db.filmDao().clearTable()
-                        }
-                        db.filmDao().insertAll(data.map { movie -> movie.mapToMovieDbEntity() })
+    val loadMoviePageFlow: Flow<DataResult<Int>> = moviePageToLoad
+        .flatMapLatest { page ->
+            flow {
+                emit(DataResult.Loading())
+
+                val movies = loadMovies("", page)
+                if (!movies.isNullOrEmpty()) {
+                    if (page == 1) {
+                        db.filmDao().clearTable()
                     }
-                )
-            }
+                    db.filmDao().insertAll(movies.map { movie -> movie.mapToMovieDbEntity() })
+                } else {
+                    emit(DataResult.Error(Throwable("Some Error Message")))
+                }
 
-    private val dbMoviesFlow = db.filmDao().getMoviesFlow()
-        .map { movieDbEntityList ->
-            DataResult.Success(movieDbEntityList.map { movieDbEntity -> movieDbEntity.mapToMovie() })
+                emit(DataResult.Success(page))
+            }
         }
 
-    val moviesFlow: Flow<DataResult<List<Movie>>> = merge(cachingMoviesFlow, dbMoviesFlow)
-        .distinctUntilChanged()
+    val searchFlow: Flow<DataResult<List<Movie>>> =
+        moviePageToLoad.combine(queryForSearch) { page, query ->
+            val movies = loadMovies(query, page)
+            if (!movies.isNullOrEmpty()) {
+                DataResult.Success(movies)
+            } else {
+                DataResult.Error(Throwable("Some Error Message"))
+            }
+        }
+
+    val popularMoviesFlow: Flow<DataResult<List<Movie>>> = db.filmDao().getPopularMoviesFlow()
+        .map { movieDbEntity ->
+            val movies = movieDbEntity.map { movieDbEntity -> movieDbEntity.mapToMovie() }
+            DataResult.Success(movies)
+        }
+
+
+    suspend fun loadMoviePage(pageId: Int) {
+        moviePageToLoad.emit(pageId)
+    }
+
+    suspend fun emitSearchQuery(query: String) {
+        queryForSearch.emit(query)
+    }
 
     suspend fun loadMovieById(movieId: Long): MovieDetails = coroutineScope {
         val configurationInfo = async { getCachedConfigInfoOrLoad() }
@@ -81,9 +100,9 @@ class MoviesRepository(
         )
     }
 
-    suspend fun loadMovies(page: Int): List<Movie> = coroutineScope {
+    suspend fun loadMovies(queryString: String?, page: Int): List<Movie> = coroutineScope {
         val configurationInfo = async { getCachedConfigInfoOrLoad() }
-        val movies = async { movieService.loadPopular(page = page).results }
+        val movies = async { getMovieDataSource(queryString, page) }
         val genresMap = async { getCachedGenresOrLoad() }
 
         val posterImageUrl = configurationInfo.await().getImageUrlByType(ImageType.POSTER)
@@ -95,18 +114,14 @@ class MoviesRepository(
         }
     }
 
-    suspend fun loadMoviePage(pageId: Int){
-        moviePageToLoad.emit(pageId)
-    }
-
-//    private suspend fun getMovieDataSource(
-//        queryString: String?,
-//        page: Int
-//    ): List<MovieResponse> = if (queryString.isNullOrEmpty()) {
-//        movieService.loadPopular(page = page)
-//    } else {
-//        movieService.searchMovie(query = queryString, page = page)
-//    }.results
+    private suspend fun getMovieDataSource(
+        queryString: String?,
+        page: Int
+    ): List<MovieResponse> = if (queryString.isNullOrEmpty()) {
+        movieService.loadPopular(page = page)
+    } else {
+        movieService.searchMovie(query = queryString, page = page)
+    }.results
 
 
     private suspend fun getCachedGenresOrLoad(): Map<Long, Genre> = mutex.withLock {
@@ -134,25 +149,3 @@ class MoviesRepository(
         }
     }
 }
-
-fun <T> fetchWithCachingFlow(
-    databaseQuery: suspend () -> T,
-    networkCall: suspend () -> T,
-    saveCallResult: suspend (T) -> Unit
-): Flow<DataResult<T>> =
-    flow {
-        emit(DataResult.Loading())
-        val cachedResult = DataResult.Success(databaseQuery.invoke())
-        emit(cachedResult)
-
-        try {
-            val response = DataResult.Success(networkCall.invoke())
-            saveCallResult(response.value)
-            emit(response)
-        } catch (throwable: Throwable) {
-            val error = DataResult.Error(throwable)
-            emit(error)
-            emit(cachedResult)
-        }
-    }
-

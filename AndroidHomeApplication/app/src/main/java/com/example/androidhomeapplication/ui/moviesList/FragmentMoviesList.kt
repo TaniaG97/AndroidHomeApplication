@@ -3,11 +3,9 @@ package com.example.androidhomeapplication.ui.moviesList
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -42,50 +40,64 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
         binding.cinemaRv.adapter = adapter
 
         initListeners()
+    }
+
+    private fun initListeners() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.moviesFromFlow.collect { moviesDataResult ->
                 when (moviesDataResult) {
                     is DataResult.Success<List<Movie>> -> {
-                        isLoading = false
                         adapter.submitList(moviesDataResult.value)
                     }
                     is DataResult.EmptyResult -> {
-                        isLoading = false
                         showShortToast(R.string.empty_movies_list)
+                    }
+                    else -> {}
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.popularMoviesFlow.collect { result ->
+                when (result) {
+                    is DataResult.Success<Int> -> {
+                        isLoading = false
+                        viewModel.lastLoadedPage = result.value
+                        Log.e("FragmentMoviesList", "currentPage: " + result.value)
                     }
                     is DataResult.Error -> {
                         isLoading = false
-                        Log.e("FragmentMoviesList", "getMoviesList: Failed", moviesDataResult.error)
+                        Log.e("FragmentMoviesList", "Loading page: Failed", result.error)
                         showShortToast(R.string.something_wrong)
                     }
                     is DataResult.Loading -> {
                         isLoading = true
                     }
+                    else -> {  }
                 }
             }
         }
-    }
-
-    private fun initListeners() {
 
         binding.textInputLayout.textInputEditText.textChanges()
             .debounce(500)
             .map { charSequence -> charSequence?.toString() }
             .distinctUntilChanged()
             .map { value ->
-                //search
-                //viewModel.loadData(value)
-                //pagingAdapter.refresh()
+                if (viewModel.lastQuery != value) {
+                    adapter.submitList(emptyList())
+                    viewModel.setQuery(value ?: "")
+                }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         binding.cinemaRv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 0) {
-                    val visibleItemCount = recyclerView.getLayoutManager()!!.getChildCount()
-                    val totalItemCount = recyclerView.getLayoutManager()!!.getItemCount()
+                if (dy > 0 && recyclerView.layoutManager != null) {
+                    val layoutManager = recyclerView.layoutManager!!
+
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
                     val pastVisibleItem =
                         (recyclerView.layoutManager as GridLayoutManager).findFirstVisibleItemPosition()
 
