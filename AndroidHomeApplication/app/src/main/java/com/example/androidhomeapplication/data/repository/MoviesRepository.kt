@@ -40,8 +40,9 @@ class MoviesRepository(
     val loadMoviePageFlow: Flow<DataResult<Int>> =
     moviePageToLoad.combineTransform(queryForSearch) { page, query ->
         emit(DataResult.Loading())
-        val movies = loadMovies(query, page)
-        if (movies != null) {
+
+        try {
+            val movies = loadMovies(query, page)
             if (query.isEmpty()){
                 if (page == 1) {
                     db.filmDao().clearTable()
@@ -54,7 +55,8 @@ class MoviesRepository(
                 searchFlow.emit(DataResult.Success(movies))
             }
             emit(DataResult.Success(page))
-        } else {
+        }
+        catch (throwable: Throwable){
             emit(DataResult.Error(Throwable("Some Error Message")))
         }
     }
@@ -64,7 +66,6 @@ class MoviesRepository(
             val movies = movieDbEntity.map { movieDbEntity -> movieDbEntity.mapToMovie() }
             DataResult.Success(movies)
         }
-
 
     suspend fun loadMoviePage(pageId: Int) {
         moviePageToLoad.emit(pageId)
@@ -94,7 +95,7 @@ class MoviesRepository(
         )
     }
 
-    suspend fun loadMovies(queryString: String?, page: Int): List<Movie>? = coroutineScope {
+    suspend fun loadMovies(queryString: String?, page: Int): List<Movie> = coroutineScope {
         val configurationInfo = async { getCachedConfigInfoOrLoad() }
         val movies = async { getMovieDataSource(queryString, page) }
         val genresMap = async { getCachedGenresOrLoad() }

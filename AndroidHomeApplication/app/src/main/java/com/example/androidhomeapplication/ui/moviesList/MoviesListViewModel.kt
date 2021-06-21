@@ -24,7 +24,7 @@ class MoviesListViewModel(
             }
         }
 
-    var popularMoviesFlow = moviesRepository.loadMoviePageFlow
+    var pageFlow = moviesRepository.loadMoviePageFlow
 
     var lastQuery = ""
     var lastLoadedPage = 0
@@ -40,9 +40,7 @@ class MoviesListViewModel(
         lastQuery = query
         viewModelScope.launch {
             isSearchModFlow.value = query.isNotEmpty()
-            if (isSearchModFlow.value) {
-                moviesRepository.emitSearchQuery(query)
-            }
+            moviesRepository.emitSearchQuery(query)
             lastLoadedPage = 0
             loadMoviePage()
         }

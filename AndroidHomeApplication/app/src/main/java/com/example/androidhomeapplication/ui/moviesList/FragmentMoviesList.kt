@@ -56,7 +56,6 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
                             set.addAll(moviesDataResult.value)
                             adapter.submitList(set.toList())
                         }
-//                        adapter.submitList(moviesDataResult.value)
                     }
                     is DataResult.EmptyResult -> {
                         showShortToast(R.string.empty_movies_list)
@@ -67,20 +66,20 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.popularMoviesFlow.collect { result ->
+            viewModel.pageFlow.collect { result ->
                 when (result) {
+                    is DataResult.Loading -> {
+                        isLoading = true
+                    }
                     is DataResult.Success<Int> -> {
                         isLoading = false
                         viewModel.lastLoadedPage = result.value
-                        Log.e("FragmentMoviesList", "currentPage: " + result.value)
+                        Log.d("FragmentMoviesList", "currentPage: " + result.value)
                     }
                     is DataResult.Error -> {
                         isLoading = false
                         Log.e("FragmentMoviesList", "Loading page: Failed", result.error)
                         showShortToast(R.string.something_wrong)
-                    }
-                    is DataResult.Loading -> {
-                        isLoading = true
                     }
                     else -> {  }
                 }
