@@ -1,58 +1,60 @@
 package com.example.androidhomeapplication.data.remote.response
 
+import android.os.Parcelable
 import com.example.androidhomeapplication.data.models.Actor
-import kotlinx.serialization.*
+import com.squareup.moshi.Json
+import kotlinx.android.parcel.Parcelize
 
-@Serializable
-data class MovieCreditsResponse (
-    @SerialName("id")
+@Parcelize
+data class MovieCreditsResponse(
+    @Json(name = "id")
     val id: Long,
 
-    @SerialName("cast")
+    @Json(name = "cast")
     val cast: List<CastResponse>,
 
-    @SerialName("crew")
+    @Json(name = "crew")
     val crew: List<CastResponse>
-)
+) : Parcelable
 
-@Serializable
-data class CastResponse (
-    @SerialName("adult")
+@Parcelize
+data class CastResponse(
+    @Json(name = "adult")
     val adult: Boolean,
 
-    @SerialName("gender")
+    @Json(name = "gender")
     val gender: Long,
 
-    @SerialName("id")
+    @Json(name = "id")
     val id: Long,
 
-    @SerialName("known_for_department")
+    @Json(name = "known_for_department")
     val knownForDepartment: String,
 
-    @SerialName("name")
+    @Json(name = "name")
     val name: String,
 
-    @SerialName("original_name")
+    @Json(name = "original_name")
     val originalName: String,
 
-    @SerialName("popularity")
+    @Json(name = "popularity")
     val popularity: Double,
 
-    @SerialName("profile_path")
+    @Json(name = "profile_path")
     val profilePath: String? = null,
 
-    @SerialName("cast_id")
+    @Json(name = "cast_id")
     val castId: Long? = null,
 
-    @SerialName("character")
+    @Json(name = "character")
     val character: String? = null,
 
-    @SerialName("credit_id")
+    @Json(name = "credit_id")
     val creditId: String,
 
-    @SerialName("order")
+    @Json(name = "order")
     val order: Long? = null,
-)
+) : Parcelable
 
 fun CastResponse.mapToActor(profileUrl: String): Actor =
     Actor(

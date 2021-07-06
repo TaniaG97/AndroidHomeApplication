@@ -1,32 +1,51 @@
 package com.example.androidhomeapplication.ui.moviesList
 
 import androidx.lifecycle.*
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import com.example.androidhomeapplication.data.constans.Constants
+import com.example.androidhomeapplication.utils.DataResult
 import com.example.androidhomeapplication.data.models.Movie
-import com.example.androidhomeapplication.data.paging.MoviesPagingSource
 import com.example.androidhomeapplication.data.repository.MoviesRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.launch
 
 class MoviesListViewModel(
     private val moviesRepository: MoviesRepository
 ) : ViewModel() {
 
-    private var searchPagingSource = MoviesPagingSource(moviesRepository, null)
+    val isSearchModFlow = MutableStateFlow(false)
 
-    val movieItems: Flow<PagingData<Movie>> by lazy {
-        Pager(PagingConfig(pageSize = Constants.DEFAULT_ITEM_PER_PAGE)) {
-            searchPagingSource
-        }.flow.cachedIn(viewModelScope)
+    var moviesFromFlow: Flow<DataResult<List<Movie>>> =
+        isSearchModFlow.flatMapLatest { isSearchMod ->
+            if (isSearchMod) {
+                moviesRepository.searchFlow
+            } else {
+                moviesRepository.popularMoviesFlow
+            }
+        }
+
+    var pageFlow = moviesRepository.loadMoviePageFlow
+
+    var lastQuery = ""
+    var lastLoadedPage = 0
+
+
+    fun loadMoviePage() {
+        viewModelScope.launch {
+            moviesRepository.loadMoviePage(lastLoadedPage + 1)
+        }
     }
 
-    fun loadData(queryString: String?) {
-        searchPagingSource = MoviesPagingSource(moviesRepository, queryString)
+    fun setQuery(query: String) {
+        lastQuery = query
+        viewModelScope.launch {
+            isSearchModFlow.value = query.isNotEmpty()
+            moviesRepository.emitSearchQuery(query)
+            lastLoadedPage = 0
+            loadMoviePage()
+        }
     }
+
 }
 
 class MoviesListViewModelFactory(

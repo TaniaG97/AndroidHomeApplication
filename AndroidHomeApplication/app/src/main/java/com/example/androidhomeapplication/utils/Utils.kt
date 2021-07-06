@@ -1,4 +1,4 @@
-package com.example.androidhomeapplication
+package com.example.androidhomeapplication.utils
 
 
 object Utils {

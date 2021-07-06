@@ -1,40 +1,43 @@
 package com.example.androidhomeapplication.data.remote.response
 
+import android.os.Parcelable
 import com.example.androidhomeapplication.data.repository.ImageType
+import com.squareup.moshi.Json
+import kotlinx.android.parcel.Parcelize
 import kotlinx.serialization.*
 
-@Serializable
+@Parcelize
 data class ConfigurationResponse(
-    @SerialName("images")
+    @Json(name = "images")
     val images: Images,
 
-    @SerialName("change_keys")
+    @Json(name = "change_keys")
     val changeKeys: List<String>
-)
+) : Parcelable
 
-@Serializable
+@Parcelize
 data class Images(
-    @SerialName("base_url")
+    @Json(name = "base_url")
     val baseUrl: String,
 
-    @SerialName("secure_base_url")
+    @Json(name = "secure_base_url")
     val secureBaseUrl: String,
 
-    @SerialName("backdrop_sizes")
+    @Json(name = "backdrop_sizes")
     val backdropSizes: List<String>,
 
-    @SerialName("logo_sizes")
+    @Json(name = "logo_sizes")
     val logoSizes: List<String>,
 
-    @SerialName("poster_sizes")
+    @Json(name = "poster_sizes")
     val posterSizes: List<String>,
 
-    @SerialName("profile_sizes")
+    @Json(name = "profile_sizes")
     val profileSizes: List<String>,
 
-    @SerialName("still_sizes")
+    @Json(name = "still_sizes")
     val stillSizes: List<String>
-)
+) : Parcelable
 
 fun ConfigurationResponse.getImageUrlByType(imageType: ImageType): String {
     val secureBaseURL = this.images.secureBaseUrl

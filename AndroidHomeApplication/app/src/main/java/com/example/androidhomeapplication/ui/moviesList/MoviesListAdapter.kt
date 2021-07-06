@@ -3,8 +3,8 @@ package com.example.androidhomeapplication.ui.moviesList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.androidhomeapplication.R
@@ -16,7 +16,7 @@ import com.example.androidhomeapplication.setRating
 
 class MoviesListAdapter(
     private val onItemClick: ((Movie) -> Unit)
-) : PagingDataAdapter<Movie, MovieItemViewHolder>(TaskDiffCallBack()) {
+) : ListAdapter<Movie, MovieItemViewHolder>(TaskDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieItemViewHolder {
         val view =
@@ -24,12 +24,8 @@ class MoviesListAdapter(
         return MovieItemViewHolder(view, onItemClick)
     }
 
-    override fun onBindViewHolder(holder: MovieItemViewHolder, position: Int) {
-        val item: Movie? = getItem(position)
-        if (item != null) {
-            holder.bind(item)
-        }
-    }
+    override fun onBindViewHolder(holder: MovieItemViewHolder, position: Int) =
+        holder.bind(getItem(position))
 }
 
 private class TaskDiffCallBack : DiffUtil.ItemCallback<Movie>() {
@@ -60,8 +56,7 @@ class MovieItemViewHolder(
         binding.itemIconLike.setImageActiveState(isActive = itemData.isLiked)
         binding.itemMoveTypes.text = itemData.genres.joinToString(", ") { genre -> genre.name }
         binding.itemStars.setRating(itemData.rating)
-        binding.itemTextReviews.text =
-            itemView.context?.getString(R.string.reviews_template, itemData.reviewCount)
+        binding.itemTextReviews.text = itemView.context?.getString(R.string.reviews_template, itemData.reviewCount)
         binding.itemTextTitle.text = itemData.title
         binding.itemMoveTime.text = "" //todo change to show movie release date
     }

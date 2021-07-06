@@ -1,0 +1,76 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "608ead1a6c82d7d3ca0dbd92b0e283f9",
+    "entities": [
+      {
+        "tableName": "movies",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `ageLimit` INTEGER NOT NULL, `title` TEXT NOT NULL, `reviewCount` INTEGER NOT NULL, `isLiked` INTEGER NOT NULL, `rating` INTEGER NOT NULL, `imageUrl` TEXT NOT NULL, `storyLine` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ageLimit",
+            "columnName": "ageLimit",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reviewCount",
+            "columnName": "reviewCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isLiked",
+            "columnName": "isLiked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imageUrl",
+            "columnName": "imageUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "storyLine",
+            "columnName": "storyLine",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '608ead1a6c82d7d3ca0dbd92b0e283f9')"
+    ]
+  }
+}
