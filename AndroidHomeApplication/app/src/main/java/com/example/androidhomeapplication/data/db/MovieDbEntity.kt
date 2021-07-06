@@ -4,11 +4,7 @@ import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.androidhomeapplication.Utils
 import com.example.androidhomeapplication.data.models.*
-import com.example.androidhomeapplication.data.remote.response.MovieDetailsResponse
-import com.example.androidhomeapplication.data.remote.response.MovieResponse
-import com.example.androidhomeapplication.data.remote.response.mapToGenre
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

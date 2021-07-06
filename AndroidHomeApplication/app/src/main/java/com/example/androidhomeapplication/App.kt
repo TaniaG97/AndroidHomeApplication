@@ -1,7 +1,6 @@
 package com.example.androidhomeapplication
 
 import android.app.Application
-import com.example.androidhomeapplication.data.db.DbProvider
 import com.example.androidhomeapplication.data.db.FilmDatabase
 import com.example.androidhomeapplication.data.remote.RetrofitBuilder
 import com.example.androidhomeapplication.data.remote.services.ConfigurationService
@@ -15,17 +14,16 @@ import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.Router
 import retrofit2.Retrofit
 
-class App : Application(), RouterProvider, NavigatorHolderProvider, RepositoryProvider, DbProvider {
+class App : Application(), RouterProvider, NavigatorHolderProvider, RepositoryProvider{
     private val cicerone = Cicerone.create()
 
     override val router: Router get() = cicerone.router
     override val navigatorHolder: NavigatorHolder get() = cicerone.getNavigatorHolder()
-    override val db: FilmDatabase by lazy { FilmDatabase.getDatabase(this)}
 
     override val movieRepository: MoviesRepository by lazy {
         val retrofit: Retrofit = RetrofitBuilder.buildRetrofit()
         MoviesRepository(
-            db,
+            FilmDatabase.getDatabase(this),
             retrofit.create(MoviesService::class.java),
             retrofit.create(ConfigurationService::class.java)
         )

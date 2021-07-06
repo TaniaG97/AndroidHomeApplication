@@ -1,7 +1,7 @@
 package com.example.androidhomeapplication.ui.moviesList
 
 import androidx.lifecycle.*
-import com.example.androidhomeapplication.DataResult
+import com.example.androidhomeapplication.utils.DataResult
 import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.repository.MoviesRepository
 import kotlinx.coroutines.flow.Flow

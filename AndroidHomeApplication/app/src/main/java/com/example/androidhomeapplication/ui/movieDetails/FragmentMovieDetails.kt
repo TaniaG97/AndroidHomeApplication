@@ -13,6 +13,7 @@ import com.example.androidhomeapplication.databinding.FragmentMovieDetailsBindin
 import com.example.androidhomeapplication.data.models.Actor
 import com.example.androidhomeapplication.data.models.MovieDetails
 import com.example.androidhomeapplication.navigation.RouterProvider
+import com.example.androidhomeapplication.utils.DataResult
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
 private const val KEY_MOVIE_ID = "movie_id"

@@ -1,10 +1,8 @@
 package com.example.androidhomeapplication.data.remote.response
 
 import android.os.Parcelable
-import com.example.androidhomeapplication.Utils
-import com.example.androidhomeapplication.data.db.MovieDbEntity
+import com.example.androidhomeapplication.utils.Utils
 import com.example.androidhomeapplication.data.models.Actor
-import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.models.MovieDetails
 import com.squareup.moshi.Json

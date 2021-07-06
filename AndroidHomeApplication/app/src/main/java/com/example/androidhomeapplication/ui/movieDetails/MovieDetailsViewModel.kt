@@ -2,7 +2,7 @@ package com.example.androidhomeapplication.ui.movieDetails
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.androidhomeapplication.DataResult
+import com.example.androidhomeapplication.utils.DataResult
 import com.example.androidhomeapplication.data.models.MovieDetails
 import com.example.androidhomeapplication.data.repository.MoviesRepository
 import kotlinx.coroutines.launch

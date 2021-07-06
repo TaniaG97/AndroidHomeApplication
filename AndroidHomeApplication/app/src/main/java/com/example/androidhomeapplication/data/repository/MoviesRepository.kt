@@ -1,6 +1,6 @@
 package com.example.androidhomeapplication.data.repository
 
-import com.example.androidhomeapplication.DataResult
+import com.example.androidhomeapplication.utils.DataResult
 import com.example.androidhomeapplication.data.db.FilmDatabase
 import com.example.androidhomeapplication.data.db.mapToMovie
 import com.example.androidhomeapplication.data.models.Genre

@@ -15,6 +15,7 @@ import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.databinding.FragmentMoviesListBinding
 import com.example.androidhomeapplication.ui.movieDetails.MovieDetailsScreen
 import com.example.androidhomeapplication.navigation.RouterProvider
+import com.example.androidhomeapplication.utils.DataResult
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import kotlinx.android.synthetic.main.fragment_movies_list.view.*
 import kotlinx.coroutines.flow.*
