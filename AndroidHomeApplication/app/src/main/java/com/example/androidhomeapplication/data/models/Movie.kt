@@ -1,6 +1,6 @@
 package com.example.androidhomeapplication.data.models
 
-import com.example.androidhomeapplication.data.db.MovieDbEntity
+import com.example.androidhomeapplication.data.room.MovieEntity
 
 data class Movie(
     val id: Long,
@@ -14,17 +14,15 @@ data class Movie(
     val popularity: Double
 )
 
-fun Movie.mapToMovieDbEntity() =
-    MovieDbEntity(
+fun Movie.mapToMovieEntity(): MovieEntity =
+    MovieEntity(
         id = this.id,
+        pgAge = this.ageLimit,
         title = this.title,
-        imageUrl = this.imageUrl ?: "",
-        rating = this.rating,
         reviewCount = this.reviewCount,
-        ageLimit = this.ageLimit,
         isLiked = this.isLiked,
-        genres = this.genres,
-        actors = listOf(),
-        storyLine = "",
-        popularity = this.popularity
+        rating = this.rating,
+        imageUrl = this.imageUrl,
+        popularity = this.popularity,
+        storyLine = ""
     )

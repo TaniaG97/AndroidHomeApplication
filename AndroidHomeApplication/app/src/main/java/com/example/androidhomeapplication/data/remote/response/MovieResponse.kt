@@ -2,7 +2,6 @@ package com.example.androidhomeapplication.data.remote.response
 
 import android.os.Parcelable
 import com.example.androidhomeapplication.utils.Utils
-import com.example.androidhomeapplication.data.db.MovieDbEntity
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
 import com.squareup.moshi.Json
@@ -63,20 +62,5 @@ fun MovieResponse.mapToMovie(posterUrl: String, genres: List<Genre>): Movie =
         ageLimit = Utils.getAgeLimit(this.adult),
         isLiked = false,
         genres = genres,
-        popularity = this.popularity
-    )
-
-fun MovieResponse.mapToMovieDbEntity(posterUrl: String, genres: List<Genre>): MovieDbEntity =
-    MovieDbEntity(
-        id = this.id.toLong(),
-        title = this.title,
-        imageUrl = posterUrl + this.posterPath,
-        rating = this.voteAverage.toInt(),
-        reviewCount = this.voteCount,
-        ageLimit = Utils.getAgeLimit(this.adult),
-        isLiked = false,
-        genres = genres,
-        storyLine = "",
-        actors = listOf(),
         popularity = this.popularity
     )

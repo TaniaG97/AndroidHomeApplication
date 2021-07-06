@@ -1,15 +1,14 @@
 package com.example.androidhomeapplication.data.repository
 
 import com.example.androidhomeapplication.utils.DataResult
-import com.example.androidhomeapplication.data.db.FilmDatabase
-import com.example.androidhomeapplication.data.db.mapToMovie
+import com.example.androidhomeapplication.data.room.mapToMovie
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.models.MovieDetails
-import com.example.androidhomeapplication.data.models.mapToMovieDbEntity
 import com.example.androidhomeapplication.data.remote.response.*
 import com.example.androidhomeapplication.data.remote.services.ConfigurationService
 import com.example.androidhomeapplication.data.remote.services.MoviesService
+import com.example.androidhomeapplication.data.room.MovieDatabase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
@@ -25,7 +24,7 @@ enum class ImageType(val size: String) {
 }
 
 class MoviesRepository(
-    private val db: FilmDatabase,
+    private val db: MovieDatabase,
     private val movieService: MoviesService,
     private val configurationService: ConfigurationService
 ) {
@@ -38,32 +37,31 @@ class MoviesRepository(
     val searchFlow = MutableStateFlow<DataResult<List<Movie>>>(DataResult.Success(listOf()))
 
     val loadMoviePageFlow: Flow<DataResult<Int>> =
-    moviePageToLoad.combineTransform(queryForSearch) { page, query ->
-        emit(DataResult.Loading())
+        moviePageToLoad.combineTransform(queryForSearch) { page, query ->
+            emit(DataResult.Loading())
 
-        try {
-            val movies = loadMovies(query, page)
-            if (query.isEmpty()){
-                if (page == 1) {
-                    db.filmDao().clearTable()
+            try {
+                val movies = loadMovies(query, page)
+                if (query.isEmpty()) {
+                    if (page == 1) {
+                        db.movieDao().clearTable()
+                    }
+                    db.movieDao().insertMovies(movies)
+                } else {
+                    if (page == 1) {
+                        searchFlow.emit(DataResult.Success(listOf()))
+                    }
+                    searchFlow.emit(DataResult.Success(movies))
                 }
-                db.filmDao().insertAll(movies.map { movie -> movie.mapToMovieDbEntity() })
-            }else{
-                if (page == 1) {
-                    searchFlow.emit(DataResult.Success(listOf()))
-                }
-                searchFlow.emit(DataResult.Success(movies))
+                emit(DataResult.Success(page))
+            } catch (throwable: Throwable) {
+                emit(DataResult.Error(Throwable("Some Error Message")))
             }
-            emit(DataResult.Success(page))
         }
-        catch (throwable: Throwable){
-            emit(DataResult.Error(Throwable("Some Error Message")))
-        }
-    }
 
-    val popularMoviesFlow: Flow<DataResult<List<Movie>>> = db.filmDao().getPopularMoviesFlow()
-        .map { movieDbEntity ->
-            val movies = movieDbEntity.map { movieDbEntity -> movieDbEntity.mapToMovie() }
+    val popularMoviesFlow: Flow<DataResult<List<Movie>>> = db.movieDao().getPopularMoviesFlow()
+        .map { moviesWithGenres ->
+            val movies = moviesWithGenres.map { movieWithGenres -> movieWithGenres.mapToMovie() }
             DataResult.Success(movies)
         }
 
@@ -89,10 +87,9 @@ class MoviesRepository(
             }
         }
 
-        details.await().mapToMovieDetails(
-            backdropImageUrl,
-            casts.await()
-        )
+        val movieDetails = details.await().mapToMovieDetails(backdropImageUrl, casts.await())
+        db.movieDao().saveMovieDetailsItem(movieDetails)
+        movieDetails
     }
 
     suspend fun loadMovies(queryString: String?, page: Int): List<Movie> = coroutineScope {

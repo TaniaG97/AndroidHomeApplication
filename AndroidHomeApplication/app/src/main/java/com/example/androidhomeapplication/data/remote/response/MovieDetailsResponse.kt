@@ -87,17 +87,3 @@ fun MovieDetailsResponse.mapToMovieDetails(backdropUrl: String, casts: List<Acto
         storyLine = this.overview,
         actors = casts
     )
-
-//fun MovieDetailsResponse.mapToMovieDbEntity(backdropUrl: String, casts: List<Actor>): MovieDbEntity =
-//    MovieDbEntity(
-//        id = this.id.toLong(),
-//        title = this.title,
-//        imageUrl = backdropUrl + this.posterPath,
-//        rating = this.voteAverage.toInt(),
-//        reviewCount = this.voteCount,
-//        ageLimit = Utils.getAgeLimit(this.adult),
-//        isLiked = false,
-//        genres = this.genres.map { genreResponse -> genreResponse.mapToGenre() },
-//        storyLine = this.overview,
-//        actors = casts
-//    )
