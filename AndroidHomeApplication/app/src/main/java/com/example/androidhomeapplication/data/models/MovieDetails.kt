@@ -10,7 +10,7 @@ data class MovieDetails(
 
 fun MovieDetails.mapToMovieEntity(): MovieEntity =
     MovieEntity(
-        id = this.movieBaseInfo.id,
+        movieId = this.movieBaseInfo.id,
         pgAge = this.movieBaseInfo.ageLimit,
         title = this.movieBaseInfo.title,
         reviewCount = this.movieBaseInfo.reviewCount,
@@ -18,5 +18,4 @@ fun MovieDetails.mapToMovieEntity(): MovieEntity =
         rating = this.movieBaseInfo.rating,
         imageUrl = this.movieBaseInfo.imageUrl,
         popularity = this.movieBaseInfo.popularity,
-        storyLine = this.storyLine
     )

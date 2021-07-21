@@ -1,6 +1,7 @@
 package com.example.androidhomeapplication
 
 import android.app.Application
+import androidx.room.RoomDatabase
 import com.example.androidhomeapplication.data.remote.RetrofitBuilder
 import com.example.androidhomeapplication.data.remote.services.ConfigurationService
 import com.example.androidhomeapplication.data.remote.services.MoviesService
@@ -23,10 +24,9 @@ class App : Application(), RouterProvider, NavigatorHolderProvider, RepositoryPr
     override val movieRepository: MoviesRepository by lazy {
         val retrofit: Retrofit = RetrofitBuilder.buildRetrofit()
         MoviesRepository(
-            MovieDatabase.getDatabase(this),
+            MovieDatabase.createDatabase(this),
             retrofit.create(MoviesService::class.java),
             retrofit.create(ConfigurationService::class.java)
         )
     }
-
 }

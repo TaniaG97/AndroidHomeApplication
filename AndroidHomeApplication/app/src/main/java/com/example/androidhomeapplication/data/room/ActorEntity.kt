@@ -3,23 +3,19 @@ package com.example.androidhomeapplication.data.room
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.example.androidhomeapplication.data.room.ActorEntity.Companion.TABLE_NAME
 
-@Entity(
-    tableName = "actor",
-    foreignKeys = [
-        ForeignKey(
-            entity = MovieEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["parentId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
-)
+@Entity(tableName = TABLE_NAME)
 data class ActorEntity(
-    @PrimaryKey(autoGenerate = true)
-    val primaryKey: Long = 0,
-    val parentId: Long,
-    val id: Long,
+    @PrimaryKey
+    val actorId: Long,
     val name: String,
     val imageUrl: String?
-)
+) {
+    companion object {
+        const val TABLE_NAME = "actor"
+        const val COL_ACTOR_ID = "actorId"
+        const val COL_NAME = "name"
+        const val COL_IMAGE_URL = "imageUrl"
+    }
+}

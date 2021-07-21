@@ -16,13 +16,12 @@ data class Movie(
 
 fun Movie.mapToMovieEntity(): MovieEntity =
     MovieEntity(
-        id = this.id,
+        movieId = this.id,
         pgAge = this.ageLimit,
         title = this.title,
         reviewCount = this.reviewCount,
         isLiked = this.isLiked,
         rating = this.rating,
         imageUrl = this.imageUrl,
-        popularity = this.popularity,
-        storyLine = ""
+        popularity = this.popularity
     )

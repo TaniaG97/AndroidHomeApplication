@@ -5,28 +5,23 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.mapToGenreEntity
+import com.example.androidhomeapplication.data.room.GenreEntity.Companion.TABLE_NAME
 
-@Entity(
-    tableName = "genre",
-    foreignKeys = [
-        ForeignKey(
-            entity = MovieEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["parentId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
-)
+@Entity(tableName = TABLE_NAME)
 data class GenreEntity(
-    @PrimaryKey(autoGenerate = true)
-    val primaryKey: Long = 0,
-    val parentId: Long,
-    val id: Long,
+    @PrimaryKey
+    val genreId: Long,
     val name: String
-)
+) {
+    companion object {
+        const val TABLE_NAME = "genre"
+        const val COL_GENRE_ID = "genreId"
+        const val COL_NAME = "name"
+    }
+}
 
 fun GenreEntity.mapToGenre(): Genre =
     Genre(
-        id = this.id,
+        id = this.genreId,
         name = this.name
     )

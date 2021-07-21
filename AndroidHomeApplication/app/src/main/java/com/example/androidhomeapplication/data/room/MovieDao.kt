@@ -4,40 +4,14 @@ import androidx.room.*
 import com.example.androidhomeapplication.data.models.*
 import kotlinx.coroutines.flow.Flow
 
-const val TABLE_NAME = "movie"
-const val COL_ID = "id"
-const val COL_POPULARITY = "popularity"
-
-
 @Dao
 interface MovieDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveMovieItem(movie: Movie) {
-        insertMovieEntities(movie.mapToMovieEntity())
-        insertGenreEntities(movie.genres.map { genre -> genre.mapToGenreEntity(movie.id) })
-    }
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveMovieDetailsItem(movieDetails: MovieDetails) {
-        insertMovieEntities(movieDetails.mapToMovieEntity())
-        insertGenreEntities(movieDetails.movieBaseInfo.genres.map { genre ->
-            genre.mapToGenreEntity(movieDetails.movieBaseInfo.id)
-        })
-        insertActorEntities(movieDetails.actors.map { actor ->
-            actor.mapToActorEntity(movieDetails.movieBaseInfo.id)
-        })
-    }
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMovies(movies: List<Movie>) {
-        movies.forEach { movie ->
-            saveMovieItem(movie)
-        }
-    }
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMovieEntities(movieEntity: MovieEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMovieDetailsEntities(movieEntity: MovieDetailsEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertGenreEntities(genreEntity: List<GenreEntity>)
@@ -45,22 +19,66 @@ interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertActorEntities(actorEntity: List<ActorEntity>)
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $COL_ID=:movieId")
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMovieActorsCrossRef(movieActorsCrossRef: MovieActorsCrossRef)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMovieGenreCrossRef(movieGenreCrossRef: MovieGenreCrossRef)
+
+    @Transaction
+    suspend fun saveMovieItem(movie: Movie) {
+        movie.genres.forEach { genre ->
+            insertMovieGenreCrossRef(MovieGenreCrossRef(movie.id, genre.id))
+        }
+        insertMovieEntities(movie.mapToMovieEntity())
+        insertGenreEntities(movie.genres.map { genre -> genre.mapToGenreEntity() })
+    }
+
+    @Transaction
+    suspend fun saveMovieDetailsItem(movieDetails: MovieDetails) {
+        movieDetails.movieBaseInfo.genres.forEach { genre ->
+            insertMovieGenreCrossRef(MovieGenreCrossRef(movieDetails.movieBaseInfo.id, genre.id))
+        }
+        movieDetails.actors.forEach { actor ->
+            insertMovieActorsCrossRef(MovieActorsCrossRef(movieDetails.movieBaseInfo.id, actor.id))
+        }
+        insertMovieEntities(movieDetails.mapToMovieEntity())
+        insertMovieDetailsEntities(
+            MovieDetailsEntity(
+                movieEntityId = movieDetails.movieBaseInfo.id,
+                storyLine = movieDetails.storyLine
+            )
+        )
+        insertGenreEntities(movieDetails.movieBaseInfo.genres.map { genre ->
+            genre.mapToGenreEntity()
+        })
+        insertActorEntities(movieDetails.actors.map { actor ->
+            actor.mapToActorEntity()
+        })
+    }
+
+    @Transaction
+    suspend fun insertMovies(movies: List<Movie>) {
+        movies.forEach { movie ->
+            saveMovieItem(movie)
+        }
+    }
+
+    @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} WHERE ${MovieEntity.COL_MOVIE_ID}=:movieId")
     suspend fun getMovieById(movieId: Long): MovieEntity?
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $COL_ID=:movieId")
+    @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} WHERE ${MovieEntity.COL_MOVIE_ID}=:movieId")
     suspend fun getMovieWithGenresById(movieId: Long): MovieWithGenres?
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $COL_ID=:movieId")
+    @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} WHERE ${MovieEntity.COL_MOVIE_ID}=:movieId")
     suspend fun getMovieWithGenresAndActorsById(movieId: Long): MovieWithGenresAndActors?
 
-    @Query("SELECT * FROM $TABLE_NAME ORDER BY $COL_POPULARITY DESC")
+    @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} ORDER BY ${MovieEntity.COL_POPULARITY} DESC")
     suspend fun getPopularMovies(): List<MovieWithGenres>
 
-    @Query("SELECT * FROM $TABLE_NAME ORDER BY $COL_POPULARITY DESC")
+    @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} ORDER BY ${MovieEntity.COL_POPULARITY} DESC")
     fun getPopularMoviesFlow(): Flow<List<MovieWithGenres>>
 
-    @Query("DELETE FROM $TABLE_NAME")
+    @Query("DELETE FROM ${MovieEntity.TABLE_NAME}")
     suspend fun clearTable()
-
 }

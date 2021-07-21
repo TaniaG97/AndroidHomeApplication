@@ -1,56 +1,55 @@
 package com.example.androidhomeapplication.data.remote.response
 
-import android.os.Parcelable
 import com.example.androidhomeapplication.utils.Utils
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
-import com.squareup.moshi.Json
-import kotlinx.android.parcel.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@Parcelize
+@Serializable
 data class MovieResponse(
-    @Json(name = "adult")
+    @SerialName("adult")
     val adult: Boolean,
 
-    @Json(name = "backdrop_path")
+    @SerialName("backdrop_path")
     val backdropPath: String?,
 
-    @Json(name = "genre_ids")
+    @SerialName("genre_ids")
     val genreIds: List<Long>,
 
-    @Json(name = "id")
+    @SerialName("id")
     val id: Int,
 
-    @Json(name = "original_language")
+    @SerialName("original_language")
     val originalLanguage: String,
 
-    @Json(name = "original_title")
+    @SerialName("original_title")
     val originalTitle: String,
 
-    @Json(name = "overview")
+    @SerialName("overview")
     val overview: String,
 
-    @Json(name = "popularity")
+    @SerialName("popularity")
     val popularity: Double,
 
-    @Json(name = "poster_path")
+    @SerialName("poster_path")
     val posterPath: String?,
 
-    @Json(name = "release_date")
-    val releaseDate: String?,
+    @SerialName("release_date")
+    val releaseDate: String,
 
-    @Json(name = "title")
+    @SerialName("title")
     val title: String,
 
-    @Json(name = "video")
+    @SerialName("video")
     val video: Boolean,
 
-    @Json(name = "vote_average")
+    @SerialName("vote_average")
     val voteAverage: Double,
 
-    @Json(name = "vote_count")
+    @SerialName("vote_count")
     val voteCount: Long
-) : Parcelable
+)
 
 fun MovieResponse.mapToMovie(posterUrl: String, genres: List<Genre>): Movie =
     Movie(

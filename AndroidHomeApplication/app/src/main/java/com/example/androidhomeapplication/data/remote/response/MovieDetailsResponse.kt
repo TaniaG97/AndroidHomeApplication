@@ -1,75 +1,74 @@
 package com.example.androidhomeapplication.data.remote.response
 
-import android.os.Parcelable
 import com.example.androidhomeapplication.utils.Utils
 import com.example.androidhomeapplication.data.models.Actor
 import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.models.MovieDetails
-import com.squareup.moshi.Json
-import kotlinx.android.parcel.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@Parcelize
+@Serializable
 data class MovieDetailsResponse(
-    @Json(name = "adult")
+    @SerialName("adult")
     val adult: Boolean,
 
-    @Json(name = "backdrop_path")
+    @SerialName("backdrop_path")
     val backdropPath: String?,
 
-    @Json(name = "budget")
+    @SerialName("budget")
     val budget: Int,
 
-    @Json(name = "genres")
+    @SerialName("genres")
     val genres: List<GenreResponse>,
 
-    @Json(name = "homepage")
+    @SerialName("homepage")
     val homepage: String?,
 
-    @Json(name = "id")
+    @SerialName("id")
     val id: Int,
 
-    @Json(name = "imdb_id")
+    @SerialName("imdb_id")
     val imdbID: String,
 
-    @Json(name = "original_language")
+    @SerialName("original_language")
     val originalLanguage: String,
 
-    @Json(name = "original_title")
+    @SerialName("original_title")
     val originalTitle: String,
 
-    @Json(name = "overview")
+    @SerialName("overview")
     val overview: String,
 
-    @Json(name = "popularity")
+    @SerialName("popularity")
     val popularity: Double,
 
-    @Json(name = "poster_path")
+    @SerialName("poster_path")
     val posterPath: String?,
 
-    @Json(name = "release_date")
+    @SerialName("release_date")
     val releaseDate: String,
 
-    @Json(name = "runtime")
+    @SerialName("runtime")
     val runtime: Long,
 
-    @Json(name = "status")
+    @SerialName("status")
     val status: String,
 
-    @Json(name = "tagline")
+    @SerialName("tagline")
     val tagLine: String?,
 
-    @Json(name = "title")
+    @SerialName("title")
     val title: String,
 
-    @Json(name = "video")
+    @SerialName("video")
     val video: Boolean,
 
-    @Json(name = "vote_average")
+    @SerialName("vote_average")
     val voteAverage: Double,
 
-    @Json(name = "vote_count")
+    @SerialName("vote_count")
     val voteCount: Long
-) : Parcelable
+)
 
 fun MovieDetailsResponse.mapToMovieDetails(backdropUrl: String, casts: List<Actor>): MovieDetails =
     MovieDetails(

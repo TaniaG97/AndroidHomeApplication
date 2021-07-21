@@ -18,6 +18,7 @@ import com.example.androidhomeapplication.navigation.RouterProvider
 import com.example.androidhomeapplication.utils.DataResult
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import kotlinx.android.synthetic.main.fragment_movies_list.view.*
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -108,7 +109,6 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
                     val totalItemCount = layoutManager.itemCount
                     val pastVisibleItem =
                         (recyclerView.layoutManager as GridLayoutManager).findFirstVisibleItemPosition()
-
                     if (!isLoading && (visibleItemCount + pastVisibleItem) >= totalItemCount) {
                         viewModel.loadMoviePage()
                     }

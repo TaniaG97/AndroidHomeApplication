@@ -6,7 +6,15 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [MovieEntity::class, GenreEntity::class, ActorEntity::class], version = 1
+    entities = [
+        MovieEntity::class,
+        GenreEntity::class,
+        ActorEntity::class,
+        MovieGenreCrossRef::class,
+        MovieActorsCrossRef::class,
+        MovieDetailsEntity::class
+    ],
+    version = 1
 )
 abstract class MovieDatabase : RoomDatabase() {
 
@@ -15,7 +23,7 @@ abstract class MovieDatabase : RoomDatabase() {
     companion object {
         private const val DB_NAME = "movie_database"
 
-        fun getDatabase(context: Context): MovieDatabase =
+        fun createDatabase(context: Context): MovieDatabase =
             Room.databaseBuilder(
                 context.applicationContext,
                 MovieDatabase::class.java,
