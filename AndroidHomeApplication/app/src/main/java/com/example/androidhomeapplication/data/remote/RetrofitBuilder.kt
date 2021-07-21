@@ -28,7 +28,6 @@ object RetrofitBuilder {
         val json = Json {
             prettyPrint = true
             ignoreUnknownKeys = true
-            coerceInputValues = true
         }
         val contentType = "application/json".toMediaType()
 
