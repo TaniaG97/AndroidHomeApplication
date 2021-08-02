@@ -50,14 +50,10 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
             is DataResult.Success<MovieDetails> -> {
                 setMovieFields(result.value)
             }
-            is DataResult.EmptyResult -> {
-                showShortToast(R.string.empty_movie_details)
-            }
             is DataResult.Error -> {
                 Log.e("FragmentMovieDetails", "getMoviesList: Failed", result.error)
                 showShortToast(R.string.something_wrong)
             }
-            is DataResult.Loading -> Unit
         }
 
     private fun setMovieFields(movieData: MovieDetails) {

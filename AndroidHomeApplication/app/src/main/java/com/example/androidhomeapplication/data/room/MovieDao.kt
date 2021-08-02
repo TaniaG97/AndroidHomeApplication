@@ -76,9 +76,6 @@ interface MovieDao {
     @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} ORDER BY ${MovieEntity.COL_POPULARITY} DESC")
     suspend fun getPopularMovies(): List<MovieWithGenres>
 
-    @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} ORDER BY ${MovieEntity.COL_POPULARITY} DESC")
-    fun getPopularMoviesFlow(): Flow<List<MovieWithGenres>>
-
     @Query("DELETE FROM ${MovieEntity.TABLE_NAME}")
     suspend fun clearTable()
 }

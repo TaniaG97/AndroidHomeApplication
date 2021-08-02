@@ -32,47 +32,6 @@ class MoviesRepository(
     private var genres: Map<Long, Genre>? = null
     private var configInfo: ConfigurationResponse? = null
 
-    private val moviePageToLoad = MutableStateFlow(1)
-    private val queryForSearch = MutableStateFlow("")
-    val searchFlow = MutableStateFlow<DataResult<List<Movie>>>(DataResult.Success(listOf()))
-
-    val loadMoviePageFlow: Flow<DataResult<Int>> =
-        moviePageToLoad.combineTransform(queryForSearch) { page, query ->
-            emit(DataResult.Loading())
-
-            try {
-                val movies = loadMovies(query, page)
-                if (query.isEmpty()) {
-                    if (page == 1) {
-                        db.movieDao().clearTable()
-                    }
-                    db.movieDao().insertMovies(movies)
-                } else {
-                    if (page == 1) {
-                        searchFlow.emit(DataResult.Success(listOf()))
-                    }
-                    searchFlow.emit(DataResult.Success(movies))
-                }
-                emit(DataResult.Success(page))
-            } catch (throwable: Throwable) {
-                emit(DataResult.Error(Throwable("Some Error Message")))
-            }
-        }
-
-    val popularMoviesFlow: Flow<DataResult<List<Movie>>> = db.movieDao().getPopularMoviesFlow()
-        .map { moviesWithGenres ->
-            val movies = moviesWithGenres.map { movieWithGenres -> movieWithGenres.mapToMovie() }
-            DataResult.Success(movies)
-        }
-
-    suspend fun loadMoviePage(pageId: Int) {
-        moviePageToLoad.emit(pageId)
-    }
-
-    suspend fun emitSearchQuery(query: String) {
-        queryForSearch.emit(query)
-    }
-
     suspend fun loadMovieById(movieId: Long): MovieDetails = coroutineScope {
         val configurationInfo = async { getCachedConfigInfoOrLoad() }
         val details = async { movieService.loadMovieDetails(movieId) }
@@ -105,6 +64,9 @@ class MoviesRepository(
             movie.mapToMovie(posterImageUrl, movieGenres)
         }
     }
+
+    suspend fun getCachedMovies():List<Movie> =
+        db.movieDao().getPopularMovies().map { movieWithGenres -> movieWithGenres.mapToMovie() }
 
     private suspend fun getMovieDataSource(
         queryString: String?,

@@ -20,8 +20,6 @@ class MovieDetailsViewModel(
     }
 
     private fun getMovieDetails() {
-        mutableMovie.value = DataResult.Loading()
-
         viewModelScope.launch {
             mutableMovie.value = try {
                 val result = movieRepository.loadMovieById(movieId)

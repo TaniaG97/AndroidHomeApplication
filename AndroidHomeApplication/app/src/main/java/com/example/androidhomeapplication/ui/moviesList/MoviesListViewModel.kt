@@ -1,50 +1,66 @@
 package com.example.androidhomeapplication.ui.moviesList
 
 import androidx.lifecycle.*
-import com.example.androidhomeapplication.utils.DataResult
 import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.repository.MoviesRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
+import com.example.androidhomeapplication.reduxPagination.Action
+import com.example.androidhomeapplication.reduxPagination.SideEffect
+import com.example.androidhomeapplication.reduxPagination.State
+import com.example.androidhomeapplication.reduxPagination.Store
 import kotlinx.coroutines.launch
 
 class MoviesListViewModel(
     private val moviesRepository: MoviesRepository
 ) : ViewModel() {
 
-    val isSearchModFlow = MutableStateFlow(false)
+    private val mutableViewState = MutableLiveData<State>(State.Empty)
+    val viewState: LiveData<State> = mutableViewState
 
-    var moviesFromFlow: Flow<DataResult<List<Movie>>> =
-        isSearchModFlow.flatMapLatest { isSearchMod ->
-            if (isSearchMod) {
-                moviesRepository.searchFlow
-            } else {
-                moviesRepository.popularMoviesFlow
+    private val mutableErrorMessage = MutableLiveData<String>()
+    val errorMessage: LiveData<String> = mutableErrorMessage
+
+    private val mutableCachedMovies = MutableLiveData<List<Movie>>()
+    val cachedMovies: LiveData<List<Movie>> = mutableCachedMovies
+
+    var searchQuery = ""
+
+    private val pagingStore = Store<Movie>().apply {
+        render = { state -> mutableViewState.postValue(state) }
+
+        sideEffects = { sideEffect ->
+            when (sideEffect) {
+                is SideEffect.LoadPage -> loadNewPage(sideEffect.page)
+                is SideEffect.ErrorEvent -> {
+                    mutableErrorMessage.postValue(sideEffect.throwable.message)
+                }
             }
         }
+    }
 
-    var pageFlow = moviesRepository.loadMoviePageFlow
+//    init {
+//        refresh()
+//    }
 
-    var lastQuery = ""
-    var lastLoadedPage = 0
-
-
-    fun loadMoviePage() {
+    fun getCachedMovies() {
         viewModelScope.launch {
-            moviesRepository.loadMoviePage(lastLoadedPage + 1)
+            mutableCachedMovies.postValue(moviesRepository.getCachedMovies())
         }
     }
 
-    fun setQuery(query: String) {
-        lastQuery = query
+    private fun loadNewPage(page: Int) {
         viewModelScope.launch {
-            isSearchModFlow.value = query.isNotEmpty()
-            moviesRepository.emitSearchQuery(query)
-            lastLoadedPage = 0
-            loadMoviePage()
+            val moviesListResult = moviesRepository.loadMovies(searchQuery, page)
+            pagingStore.proceed(Action.NewPage(page, moviesListResult))
         }
     }
+
+    fun restart(newSearchQuery: String) {
+        searchQuery = newSearchQuery
+        pagingStore.proceed(Action.Restart)
+    }
+
+    fun refresh() = pagingStore.proceed(Action.Refresh)
+    fun loadNextPage() = pagingStore.proceed(Action.LoadMore)
 
 }
 
@@ -58,3 +74,8 @@ class MoviesListViewModelFactory(
         else -> throw IllegalArgumentException("$modelClass is not registered ViewModel")
     } as T
 }
+
+//enum class MovieApiCallType{
+//    POPULAR,
+//    SEARCH
+//}

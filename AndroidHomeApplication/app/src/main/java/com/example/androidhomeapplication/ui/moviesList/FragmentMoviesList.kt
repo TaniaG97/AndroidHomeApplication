@@ -15,6 +15,7 @@ import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.databinding.FragmentMoviesListBinding
 import com.example.androidhomeapplication.ui.movieDetails.MovieDetailsScreen
 import com.example.androidhomeapplication.navigation.RouterProvider
+import com.example.androidhomeapplication.reduxPagination.State
 import com.example.androidhomeapplication.utils.DataResult
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import kotlinx.android.synthetic.main.fragment_movies_list.view.*
@@ -46,45 +47,37 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
 
     private fun initListeners() {
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.moviesFromFlow.collect { moviesDataResult ->
-                when (moviesDataResult) {
-                    is DataResult.Success<List<Movie>> -> {
-                        if (!viewModel.isSearchModFlow.value){
-                            adapter.submitList(moviesDataResult.value)
-                        }else{
-                            val set = mutableSetOf<Movie>()
-                            set.addAll(adapter.currentList)
-                            set.addAll(moviesDataResult.value)
-                            adapter.submitList(set.toList())
-                        }
-                    }
-                    is DataResult.EmptyResult -> {
-                        showShortToast(R.string.empty_movies_list)
-                    }
-                    else -> {}
+        viewModel.viewState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is State.Empty -> {
+                    adapter.submitList(emptyList())
+                    viewModel.getCachedMovies()
+                    Log.d("FragmentMoviesList_LOG", "State.Empty")
+                }
+                is State.EmptyProgress -> {
+                    Log.d("FragmentMoviesList_LOG", "State.EmptyProgress")
+                }
+                is State.Data<*> -> {
+                    adapter.submitList(state.data as List<Movie>)
+                    Log.d("FragmentMoviesList_LOG", "State.Data: page - ${state.page}")
+                }
+                is State.Refresh<*> -> {
+                    Log.d("FragmentMoviesList_LOG", "State.Refresh: page - ${state.page}")
+                }
+                is State.NewPageProgress<*> -> {
+                    Log.d("FragmentMoviesList_LOG", "State.NewPageProgress: page - ${state.page}")
+                }
+                is State.FullData<*> -> {
+                    Log.d("FragmentMoviesList_LOG", "State.FullData: page - ${state.page}")
                 }
             }
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.pageFlow.collect { result ->
-                when (result) {
-                    is DataResult.Loading -> {
-                        isLoading = true
-                    }
-                    is DataResult.Success<Int> -> {
-                        isLoading = false
-                        viewModel.lastLoadedPage = result.value
-                        Log.d("FragmentMoviesList", "currentPage: " + result.value)
-                    }
-                    is DataResult.Error -> {
-                        isLoading = false
-                        Log.e("FragmentMoviesList", "Loading page: Failed", result.error)
-                        showShortToast(R.string.something_wrong)
-                    }
-                    else -> {  }
-                }
+        viewModel.cachedMovies.observe(viewLifecycleOwner) { movies ->
+            if (viewModel.viewState.value == State.Empty){
+                adapter.submitList(movies)
+                viewModel.refresh()
+                Log.d("FragmentMoviesList_LOG", "Show Cached data and call refresh")
             }
         }
 
@@ -93,9 +86,9 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
             .map { charSequence -> charSequence?.toString() }
             .distinctUntilChanged()
             .map { value ->
-                if (viewModel.lastQuery != value) {
+                if (viewModel.searchQuery != value) {
                     adapter.submitList(emptyList())
-                    viewModel.setQuery(value ?: "")
+                    viewModel.restart(value ?: "")
                 }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -110,7 +103,7 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
                     val pastVisibleItem =
                         (recyclerView.layoutManager as GridLayoutManager).findFirstVisibleItemPosition()
                     if (!isLoading && (visibleItemCount + pastVisibleItem) >= totalItemCount) {
-                        viewModel.loadMoviePage()
+                        viewModel.loadNextPage()
                     }
                 }
                 super.onScrolled(recyclerView, dx, dy)
