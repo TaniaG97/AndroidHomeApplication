@@ -9,6 +9,7 @@ import com.example.androidhomeapplication.data.remote.response.*
 import com.example.androidhomeapplication.data.remote.services.ConfigurationService
 import com.example.androidhomeapplication.data.remote.services.MoviesService
 import com.example.androidhomeapplication.data.room.MovieDatabase
+import com.example.androidhomeapplication.data.room.mapToMovieDetails
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
@@ -45,10 +46,7 @@ class MoviesRepository(
                 castResponse.mapToActor(profileImageUrl)
             }
         }
-
-        val movieDetails = details.await().mapToMovieDetails(backdropImageUrl, casts.await())
-        db.movieDao().saveMovieDetailsItem(movieDetails)
-        movieDetails
+        details.await().mapToMovieDetails(backdropImageUrl, casts.await())
     }
 
     suspend fun loadMovies(queryString: String?, page: Int): List<Movie> = coroutineScope {
@@ -67,6 +65,17 @@ class MoviesRepository(
 
     suspend fun getCachedMovies():List<Movie> =
         db.movieDao().getPopularMovies().map { movieWithGenres -> movieWithGenres.mapToMovie() }
+
+    suspend fun getCachedMovieById(movieId: Long): MovieDetails? =
+        db.movieDao().getMovieWithGenresAndActorsById(movieId)?.mapToMovieDetails()
+
+    suspend fun saveMoviesToCache(movies: List<Movie>){
+        db.movieDao().saveMovies(movies)
+    }
+
+    suspend fun saveMovieDetailsToCache(movieDetails: MovieDetails){
+        db.movieDao().saveMovieDetailsItem(movieDetails)
+    }
 
     private suspend fun getMovieDataSource(
         queryString: String?,

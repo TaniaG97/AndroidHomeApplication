@@ -33,7 +33,8 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
 
     private val adapter: MoviesListAdapter = MoviesListAdapter(
         onItemClick = { item ->
-            (activity?.application as? RouterProvider)?.router?.navigateTo(MovieDetailsScreen(item.id))
+            val cacheResult = viewModel.searchQuery.isEmpty()
+            (activity?.application as? RouterProvider)?.router?.navigateTo(MovieDetailsScreen(item.id, cacheResult))
         })
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,6 +45,7 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
 
         initListeners()
     }
+
 
     private fun initListeners() {
 
@@ -58,7 +60,13 @@ class FragmentMoviesList : Fragment(R.layout.fragment_movies_list) {
                     Log.d("FragmentMoviesList_LOG", "State.EmptyProgress")
                 }
                 is State.Data<*> -> {
-                    adapter.submitList(state.data as List<Movie>)
+                    val movies = state.data as List<Movie>
+                    adapter.submitList(movies)
+
+                    if (viewModel.searchQuery.isEmpty()){
+                        viewModel.saveMoviesToCache(movies)
+                    }
+
                     Log.d("FragmentMoviesList_LOG", "State.Data: page - ${state.page}")
                 }
                 is State.Refresh<*> -> {

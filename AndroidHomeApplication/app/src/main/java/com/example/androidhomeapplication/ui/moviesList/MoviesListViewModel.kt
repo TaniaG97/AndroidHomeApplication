@@ -7,6 +7,7 @@ import com.example.androidhomeapplication.reduxPagination.Action
 import com.example.androidhomeapplication.reduxPagination.SideEffect
 import com.example.androidhomeapplication.reduxPagination.State
 import com.example.androidhomeapplication.reduxPagination.Store
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MoviesListViewModel(
@@ -37,9 +38,12 @@ class MoviesListViewModel(
         }
     }
 
-//    init {
-//        refresh()
-//    }
+    private fun loadNewPage(page: Int) {
+        viewModelScope.launch {
+            val moviesListResult = moviesRepository.loadMovies(searchQuery, page)
+            pagingStore.proceed(Action.NewPage(page, moviesListResult))
+        }
+    }
 
     fun getCachedMovies() {
         viewModelScope.launch {
@@ -47,10 +51,9 @@ class MoviesListViewModel(
         }
     }
 
-    private fun loadNewPage(page: Int) {
+    fun saveMoviesToCache(movies: List<Movie>) {
         viewModelScope.launch {
-            val moviesListResult = moviesRepository.loadMovies(searchQuery, page)
-            pagingStore.proceed(Action.NewPage(page, moviesListResult))
+            moviesRepository.saveMoviesToCache(movies)
         }
     }
 
@@ -74,8 +77,3 @@ class MoviesListViewModelFactory(
         else -> throw IllegalArgumentException("$modelClass is not registered ViewModel")
     } as T
 }
-
-//enum class MovieApiCallType{
-//    POPULAR,
-//    SEARCH
-//}

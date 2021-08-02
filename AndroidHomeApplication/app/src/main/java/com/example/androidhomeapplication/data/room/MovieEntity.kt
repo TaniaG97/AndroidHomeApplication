@@ -2,7 +2,11 @@ package com.example.androidhomeapplication.data.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.androidhomeapplication.data.models.Movie
+import com.example.androidhomeapplication.data.remote.response.mapToGenre
+import com.example.androidhomeapplication.data.remote.response.mapToMovieDetails
 import com.example.androidhomeapplication.data.room.MovieEntity.Companion.TABLE_NAME
+import com.example.androidhomeapplication.utils.Utils
 
 @Entity(tableName = TABLE_NAME)
 data class MovieEntity(

@@ -17,6 +17,7 @@ import com.example.androidhomeapplication.utils.DataResult
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
 private const val KEY_MOVIE_ID = "movie_id"
+private const val KEY_CACHE_RESULT = "cache_result"
 
 class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val binding by viewBinding(FragmentMovieDetailsBinding::bind)
@@ -24,7 +25,8 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     private val viewModel: MovieDetailsViewModel by viewModels {
         MovieDetailsViewModelFactory(
             movieRepository,
-            arguments?.getLong(KEY_MOVIE_ID)!!
+            arguments?.getLong(KEY_MOVIE_ID) ?: -1,
+            arguments?.getBoolean(KEY_CACHE_RESULT) ?: false
         )
     }
 
@@ -51,18 +53,20 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
                 setMovieFields(result.value)
             }
             is DataResult.Error -> {
-                Log.e("FragmentMovieDetails", "getMoviesList: Failed", result.error)
-                showShortToast(R.string.something_wrong)
+                showShortToast(result.error.message ?: getString(R.string.something_wrong))
             }
         }
 
     private fun setMovieFields(movieData: MovieDetails) {
         binding.backgroundImage.loadImageWithGlide(movieData.movieBaseInfo.imageUrl)
-        binding.textAge.text = context?.getString(R.string.age_template, movieData.movieBaseInfo.ageLimit)
+        binding.textAge.text =
+            context?.getString(R.string.age_template, movieData.movieBaseInfo.ageLimit)
         binding.textTitle.text = movieData.movieBaseInfo.title
-        binding.textMoveTypes.text = movieData.movieBaseInfo.genres.joinToString(", ") { genre -> genre.name }
+        binding.textMoveTypes.text =
+            movieData.movieBaseInfo.genres.joinToString(", ") { genre -> genre.name }
         binding.stars.setRating(movieData.movieBaseInfo.rating)
-        binding.textReviews.text = getString(R.string.reviews_template, movieData.movieBaseInfo.reviewCount)
+        binding.textReviews.text =
+            getString(R.string.reviews_template, movieData.movieBaseInfo.reviewCount)
         binding.textStorylineDescription.text = movieData.storyLine
         updateAdapter(movieData.actors)
     }
@@ -72,13 +76,15 @@ class FragmentMovieDetails : Fragment(R.layout.fragment_movie_details) {
     }
 }
 
-class MovieDetailsScreen(private val movieId: Long) : FragmentScreen(
-    key = "MovieDetailsScreen",
-    fragmentCreator = { fragmentFactory: FragmentFactory ->
-        val fragment = FragmentMovieDetails()
-        val args = Bundle(1)
-        args.putLong(KEY_MOVIE_ID, movieId)
-        fragment.arguments = args
-        fragment
-    }
-)
+class MovieDetailsScreen(private val movieId: Long, private val cacheResult: Boolean = false) :
+    FragmentScreen(
+        key = "MovieDetailsScreen",
+        fragmentCreator = { fragmentFactory: FragmentFactory ->
+            val fragment = FragmentMovieDetails()
+            val args = Bundle(1)
+            args.putLong(KEY_MOVIE_ID, movieId)
+            args.putBoolean(KEY_CACHE_RESULT, cacheResult)
+            fragment.arguments = args
+            fragment
+        }
+    )

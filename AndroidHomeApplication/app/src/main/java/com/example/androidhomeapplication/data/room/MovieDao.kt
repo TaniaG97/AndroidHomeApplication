@@ -26,6 +26,13 @@ interface MovieDao {
     suspend fun insertMovieGenreCrossRef(movieGenreCrossRef: MovieGenreCrossRef)
 
     @Transaction
+    suspend fun saveMovies(movies: List<Movie>) {
+        movies.forEach { movie ->
+            saveMovieItem(movie)
+        }
+    }
+
+    @Transaction
     suspend fun saveMovieItem(movie: Movie) {
         movie.genres.forEach { genre ->
             insertMovieGenreCrossRef(MovieGenreCrossRef(movie.id, genre.id))
@@ -57,25 +64,10 @@ interface MovieDao {
         })
     }
 
-    @Transaction
-    suspend fun insertMovies(movies: List<Movie>) {
-        movies.forEach { movie ->
-            saveMovieItem(movie)
-        }
-    }
-
-    @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} WHERE ${MovieEntity.COL_MOVIE_ID}=:movieId")
-    suspend fun getMovieById(movieId: Long): MovieEntity?
-
-    @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} WHERE ${MovieEntity.COL_MOVIE_ID}=:movieId")
-    suspend fun getMovieWithGenresById(movieId: Long): MovieWithGenres?
-
     @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} WHERE ${MovieEntity.COL_MOVIE_ID}=:movieId")
     suspend fun getMovieWithGenresAndActorsById(movieId: Long): MovieWithGenresAndActors?
 
     @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} ORDER BY ${MovieEntity.COL_POPULARITY} DESC")
     suspend fun getPopularMovies(): List<MovieWithGenres>
 
-    @Query("DELETE FROM ${MovieEntity.TABLE_NAME}")
-    suspend fun clearTable()
 }
