@@ -1,5 +1,7 @@
 package com.example.androidhomeapplication.data.models
 
+import com.example.androidhomeapplication.data.room.MovieEntity
+
 data class Movie(
     val id: Long,
     val ageLimit: Int,
@@ -8,5 +10,18 @@ data class Movie(
     val reviewCount: Long,
     val isLiked: Boolean,
     val rating: Int,
-    val imageUrl: String?
+    val imageUrl: String?,
+    val popularity: Double
 )
+
+fun Movie.mapToMovieEntity(): MovieEntity =
+    MovieEntity(
+        movieId = this.id,
+        pgAge = this.ageLimit,
+        title = this.title,
+        reviewCount = this.reviewCount,
+        isLiked = this.isLiked,
+        rating = this.rating,
+        imageUrl = this.imageUrl,
+        popularity = this.popularity
+    )

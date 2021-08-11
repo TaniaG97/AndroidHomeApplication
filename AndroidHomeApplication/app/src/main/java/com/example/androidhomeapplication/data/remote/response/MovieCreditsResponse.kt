@@ -1,7 +1,8 @@
 package com.example.androidhomeapplication.data.remote.response
 
 import com.example.androidhomeapplication.data.models.Actor
-import kotlinx.serialization.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class MovieCreditsResponse (

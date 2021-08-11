@@ -3,10 +3,8 @@ package com.example.androidhomeapplication.data.remote
 import com.example.androidhomeapplication.BuildConfig
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
-import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 
@@ -30,7 +28,6 @@ object RetrofitBuilder {
         val json = Json {
             prettyPrint = true
             ignoreUnknownKeys = true
-            coerceInputValues = true
         }
         val contentType = "application/json".toMediaType()
 
@@ -39,6 +36,7 @@ object RetrofitBuilder {
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
+
         return retrofit
     }
 }

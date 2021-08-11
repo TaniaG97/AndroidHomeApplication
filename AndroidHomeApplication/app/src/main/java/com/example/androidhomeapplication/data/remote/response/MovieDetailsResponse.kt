@@ -1,10 +1,11 @@
 package com.example.androidhomeapplication.data.remote.response
 
-import com.example.androidhomeapplication.Utils
+import com.example.androidhomeapplication.utils.Utils
 import com.example.androidhomeapplication.data.models.Actor
 import com.example.androidhomeapplication.data.models.Movie
 import com.example.androidhomeapplication.data.models.MovieDetails
-import kotlinx.serialization.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class MovieDetailsResponse(
@@ -79,7 +80,8 @@ fun MovieDetailsResponse.mapToMovieDetails(backdropUrl: String, casts: List<Acto
             reviewCount = this.voteCount,
             isLiked = false,
             rating = this.voteAverage.toInt(),
-            imageUrl = backdropUrl + this.backdropPath
+            imageUrl = backdropUrl + this.backdropPath,
+            popularity = this.popularity
         ),
         storyLine = this.overview,
         actors = casts

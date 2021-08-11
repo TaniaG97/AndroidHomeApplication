@@ -1,32 +1,70 @@
 package com.example.androidhomeapplication.ui.moviesList
 
 import androidx.lifecycle.*
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import com.example.androidhomeapplication.data.constans.Constants
 import com.example.androidhomeapplication.data.models.Movie
-import com.example.androidhomeapplication.data.paging.MoviesPagingSource
 import com.example.androidhomeapplication.data.repository.MoviesRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.debounce
+import com.example.androidhomeapplication.reduxPagination.Action
+import com.example.androidhomeapplication.reduxPagination.SideEffect
+import com.example.androidhomeapplication.reduxPagination.State
+import com.example.androidhomeapplication.reduxPagination.Store
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MoviesListViewModel(
     private val moviesRepository: MoviesRepository
 ) : ViewModel() {
 
-    private var searchPagingSource = MoviesPagingSource(moviesRepository, null)
+    private val mutableViewState = MutableLiveData<State>(State.Empty)
+    val viewState: LiveData<State> = mutableViewState
 
-    val movieItems: Flow<PagingData<Movie>> by lazy {
-        Pager(PagingConfig(pageSize = Constants.DEFAULT_ITEM_PER_PAGE)) {
-            searchPagingSource
-        }.flow.cachedIn(viewModelScope)
+    private val mutableErrorMessage = MutableLiveData<String>()
+    val errorMessage: LiveData<String> = mutableErrorMessage
+
+    private val mutableCachedMovies = MutableLiveData<List<Movie>>()
+    val cachedMovies: LiveData<List<Movie>> = mutableCachedMovies
+
+    var searchQuery = ""
+
+    private val pagingStore = Store<Movie>().apply {
+        render = { state -> mutableViewState.postValue(state) }
+
+        sideEffects = { sideEffect ->
+            when (sideEffect) {
+                is SideEffect.LoadPage -> loadNewPage(sideEffect.page)
+                is SideEffect.ErrorEvent -> {
+                    mutableErrorMessage.postValue(sideEffect.throwable.message)
+                }
+            }
+        }
     }
 
-    fun loadData(queryString: String?) {
-        searchPagingSource = MoviesPagingSource(moviesRepository, queryString)
+    private fun loadNewPage(page: Int) {
+        viewModelScope.launch {
+            val moviesListResult = moviesRepository.loadMovies(searchQuery, page)
+            pagingStore.proceed(Action.NewPage(page, moviesListResult))
+        }
     }
+
+    fun getCachedMovies() {
+        viewModelScope.launch {
+            mutableCachedMovies.postValue(moviesRepository.getCachedMovies())
+        }
+    }
+
+    fun saveMoviesToCache(movies: List<Movie>) {
+        viewModelScope.launch {
+            moviesRepository.saveMoviesToCache(movies)
+        }
+    }
+
+    fun restart(newSearchQuery: String) {
+        searchQuery = newSearchQuery
+        pagingStore.proceed(Action.Restart)
+    }
+
+    fun refresh() = pagingStore.proceed(Action.Refresh)
+    fun loadNextPage() = pagingStore.proceed(Action.LoadMore)
+
 }
 
 class MoviesListViewModelFactory(

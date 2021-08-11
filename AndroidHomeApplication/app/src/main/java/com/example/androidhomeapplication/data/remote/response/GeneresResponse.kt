@@ -1,8 +1,6 @@
 package com.example.androidhomeapplication.data.remote.response
 
-import com.example.androidhomeapplication.data.models.Actor
 import com.example.androidhomeapplication.data.models.Genre
-import com.example.androidhomeapplication.data.models.MovieDetails
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

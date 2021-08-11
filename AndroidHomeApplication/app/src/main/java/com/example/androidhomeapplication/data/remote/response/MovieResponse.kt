@@ -1,6 +1,6 @@
 package com.example.androidhomeapplication.data.remote.response
 
-import com.example.androidhomeapplication.Utils
+import com.example.androidhomeapplication.utils.Utils
 import com.example.androidhomeapplication.data.models.Genre
 import com.example.androidhomeapplication.data.models.Movie
 import kotlinx.serialization.SerialName
@@ -12,13 +12,13 @@ data class MovieResponse(
     val adult: Boolean,
 
     @SerialName("backdrop_path")
-    val backdropPath: String?,
+    val backdropPath: String? = null,
 
     @SerialName("genre_ids")
     val genreIds: List<Long>,
 
     @SerialName("id")
-    val id: Int,
+    val id: Long,
 
     @SerialName("original_language")
     val originalLanguage: String,
@@ -33,10 +33,10 @@ data class MovieResponse(
     val popularity: Double,
 
     @SerialName("poster_path")
-    val posterPath: String?,
+    val posterPath: String? = null,
 
     @SerialName("release_date")
-    val releaseDate: String,
+    val releaseDate: String? = null,
 
     @SerialName("title")
     val title: String,
@@ -53,7 +53,7 @@ data class MovieResponse(
 
 fun MovieResponse.mapToMovie(posterUrl: String, genres: List<Genre>): Movie =
     Movie(
-        id = this.id.toLong(),
+        id = this.id,
         title = this.title,
         imageUrl = posterUrl + this.posterPath,
         rating = this.voteAverage.toInt(),
@@ -61,4 +61,5 @@ fun MovieResponse.mapToMovie(posterUrl: String, genres: List<Genre>): Movie =
         ageLimit = Utils.getAgeLimit(this.adult),
         isLiked = false,
         genres = genres,
-        )
+        popularity = this.popularity
+    )
